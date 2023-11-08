@@ -1,0 +1,4 @@
+*/.env
+*.log
+team_bot/backup/*.json
+team_bot/teams.json

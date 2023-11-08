@@ -1,0 +1,13 @@
+{
+    "prefix": "~",
+    "team_create_channel_id": 1165756636711886869,
+    "roles": {
+        "organizer": 1151380509822304276,
+        "judge": 1165730005695864944,
+        "mentor": 1165729967255064707,
+        "volunteer": 1166063575593386056,
+        "sponsor": 1166831562030076016,
+        "participant": 1165730146964217956
+    },
+    "max_team_participants": 4
+}

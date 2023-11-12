@@ -9,5 +9,6 @@
         "sponsor": 1166831562030076016,
         "participant": 1165730146964217956
     },
-    "max_team_participants": 4
+    "max_team_participants": 5,
+    "team_role_colour": "#adadad"
 }

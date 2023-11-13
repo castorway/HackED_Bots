@@ -13,20 +13,20 @@
     "max_team_participants": 5,
     "team_role_colour": "#adadad",
 
-    "judging_categories": {
-        "online": {
-            "priority": 1,
-            "react": "💻"
-        },
-        "inperson": {
-            "priority": 0,
+    "judging_categories": [
+        {
+            "name": "in-person",
             "react": "🏢"
         },
-        "mecsimcalc": {
-            "priority": 2,
+        {
+            "name": "online",
+            "react": "💻"
+        },
+        {
+            "name": "mecsimcalc",
             "react": "⚙️"
         }
-    },
+    ],
 
     "judging_rooms": {
         "online1": {

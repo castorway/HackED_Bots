@@ -9,6 +9,7 @@ And JamMack123's repo:
 
 import discord
 from discord.ext import commands
+from typing import Optional
 from discord.utils import get as dget
 import os
 from dotenv import load_dotenv
@@ -49,7 +50,7 @@ class Bot(commands.Bot):
                 if role.color != config['team_role_colour_obj']:
                     logging.warning(f"Team role name {team_name} doesn't have team colour.")
                 return True # regardless of colour
-
+    
 
 intents = discord.Intents.all() # TODO: use less permisisons
 bot = Bot(command_prefix=config['prefix'], intents=intents)
@@ -144,7 +145,7 @@ async def team(ctx):
     logging.info(f"Team created: {team_name}, {[m.name for m in team_members]}, {team_role}")
 
 
-@bot.command(help=f'''Usage: {config['prefix']}teams_info'. Only usable by Organizer role.''')
+@bot.command(help=f'''Usage: `{config['prefix']}teams_info`. Only usable by Organizer role.''')
 async def teams_info(ctx):
 
     # ignore if user not an organizer
@@ -167,5 +168,27 @@ async def teams_info(ctx):
 
     await ctx.send(msg)
     
+
+@bot.command(help=f'''Usage: `{config['prefix']}setup_judging`.''')
+async def setup_judging(ctx, channel: Optional[discord.TextChannel], message_id: Optional[str]):
+
+    print(ctx.message.content)
+    print(ctx.message.mentions)
+
+    print(channel)
+    print(message_id)
+    
+    # get all teams
+    team_roles = []
+    for role in ctx.guild.roles:
+        if role.color == config['team_role_colour_obj']:
+            team_roles.append(role)
+
+    # get reactions to judging message
+    judging_msg = discord.utils.get(bot.cached_messages, id=msg.id) #or client.messages depending on your variable
+    print(cache_msg.reactions)
+
+
+
 
 bot.run(os.environ['TEAMBOT_TOKEN'], log_handler=log_handler)

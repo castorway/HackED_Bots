@@ -17,44 +17,51 @@
     "judging_log_channel_id": 1173821955523231835,
     "judging_ping_channel_id": 1173835289328885841,
 
-    "in-person_react": "🏢",
+    "inperson_react": "🏢",
     "online_react": "💻",
+    "default_judging_medium_pref": "online",
 
-    "judging_categories": [
-        {
-            "name": "default",
-            "react": "⭐"
-        },
-        {
-            "name": "mecsimcalc",
-            "react": "⚙️"
-        },
-        {
-            "name": "edi",
-            "react": "🌈"
-        }
-    ],
-
-    "judging_rooms": {
-        "online1": {
-            "channel": 1173389613763670086,
-            "category": "online",
-            "type": "online"
-        },
-        "online2": {
-            "channel": 1173389657812238337,
-            "category": "online",
-            "type": "online"
-        },
-        "inperson1": {
-            "location": "DICE 8F 8-01",
-            "category": "in-person",
-            "type": "in-person"
+    "judging_categories": {
+        "default": {
+            "rooms": {
+                "online": ["online1", "online2"],
+                "inperson": ["inperson1"]
+            }
         },
         "mecsimcalc": {
-            "channel": 1173389682298589184,
-            "category": "mecsimcalc",
-            "type": "online"
+            "react": "⚙️",
+            "rooms": {
+                "online": ["msc1"],
+                "inperson": ["msc2"]
+            }
+        },
+        "edi": {
+            "react": "🌈",
+            "rooms": {
+                "online": [],
+                "inperson": ["dive1"]
+            }
+        }
+    },
+
+    "judging_rooms": {
+        "online1": { 
+            "waiting_vc": 1173389613763670086
+        },
+        "online2": {
+            "waiting_vc": 1173389657812238337
+        },
+        "inperson1": {
+            "location": "DICE 8F 8-01"
+        },
+        "msc1": {
+            "waiting_vc": 1173389613763670086
+        },
+        "msc2": {
+            "location": "DICE 8F 8-02"
+        },
+        "dive1": {
+            "location": "DICE 8F 8-02"
         }
     }
 }

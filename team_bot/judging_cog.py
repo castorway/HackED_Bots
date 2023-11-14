@@ -301,9 +301,34 @@ class Judging(commands.Cog):
 
 
     @commands.command(help=f'''Usage: `{config['prefix']}next <room_id>`.''')
-    async def next(self, ctx, channel: Optional[discord.TextChannel], message_id: Optional[str]):
+    async def next(self, ctx, room_id: Optional[str]):
 
         if not check_author_perms(ctx):
             return
 
+        # check arguments
+
+        if room_id not in self.judging.keys():
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Queue was not moved; room ID {room_id} either does not exist or has no participants being judged in it.")
+            return
+
+        elif self.judging[room_id]["next_team"] >= len(self.judging[room_id]["teams"]):
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Queue was not moved; there are no more participants to judge in this room.")
+            return
         
+        # move queue along
+        team_name = self.judging[room_id]["teams"][ self.judging[room_id]["next_team"] ]
+        self.judging[room_id]["next_team"] += 1
+
+        # ping the next group in judging ping channel
+        channel = dget(ctx.message.guild.channels, id=config["judging_ping_channel_id"])
+        team_role = dget(ctx.message.guild.roles, name=team_name)
+        await channel.send(f"hey {team_role.mention}, its judging time!")
+
+        # if online...
+
+        # if in-person...
+
+        # log in 

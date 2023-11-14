@@ -13,6 +13,8 @@
     "max_team_participants": 5,
     "team_role_colour": "#adadad",
 
+    "judging_log_channel_id": 1173821955523231835,
+
     "judging_categories": [
         {
             "name": "in-person",

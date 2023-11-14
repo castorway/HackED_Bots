@@ -26,3 +26,14 @@ def general_setup():
                         level=logging.DEBUG)
 
     return config
+
+
+config = general_setup()
+
+
+async def get_all_team_roles(ctx):
+    teams = []
+    for role in ctx.guild.roles:
+        if role.color == config['team_role_colour_obj']:
+            teams.append(role)
+    return teams

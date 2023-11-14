@@ -4,45 +4,113 @@ from typing import Optional
 from discord.utils import get as dget
 import logging
 from datetime import datetime
-from utils import general_setup
+import utils
 import random
 import os
 import json
+from pathlib import Path
+import asyncio
 
-config = general_setup()
+config = utils.general_setup()
+
+# set up dirs for json files
+file_path = Path(os.path.realpath(__file__)).parents[0] # path to this directory
+data_dir = file_path / "judging"
+os.makedirs(data_dir, exist_ok=True)
+
+
+# global storing current judging dict; room ids mapped to position and list of team names
+current_judging = {}
+
+
+def gen_filename(tag, ext):
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    return data_dir / f"{tag}_{timestamp}.{ext}"
+
+
+def check_author_perms(ctx):
+    """ All the commands in this cog should only be usable by users with the organizer role. """
+    for role in ctx.author.roles:
+        if role.id == config['roles']['organizer']:
+            return True
+    else:
+        return False
+
 
 async def send_as_json(ctx, dictionary, filename):
     temp_name = Path("./_temp.json")
 
     # make file
-    os.makedirs('')
-    with open(temp_name, "w") as f:
+    save_filename = gen_filename("generated", "json")
+    with open(save_filename, "w") as f:
         f.write(json.dumps(dictionary, indent=4))
 
     # send file
-    await ctx.send(file=discord.File(temp_name), filename=filename)
-
-    # get rid of file
-    os.remove(temp_name)
+    await ctx.send(file=discord.File(save_filename, filename=filename))
 
 
 class Judging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.queues = {}
+        self.judging = {}
+
+
+    def pprint_judging(self, judging=None):
+        msg = "```asciidoc\n"
+        msg += f"JUDGING\n"
+        msg += f"==========================\n"
+        msg += f"Note that the team highlighted in blue is the *current team* that is being judged (if any). The team after it is the team that will be pinged when `next <room_id>` is run.\n"
+
+        if judging == None:
+            judging = self.judging
+
+        for room_id, info in judging.items():
+            msg += f"\n{'[' + room_id + ']' :16} | next={info['next_team']}\n"
+
+            for i, team_name in enumerate(judging[room_id]["teams"]):
+                if i == info["next_team"] - 1:
+                    msg += f"= {team_name} =\n"
+                else:
+                    msg += f"* {team_name}\n"
+        
+        msg += "```"
+        
+        return msg
 
     
-    @commands.command(help=f'''Usage: `{config['prefix']}make_judging_queues`.''')
-    async def make_judging_queues(self, ctx, channel: Optional[discord.TextChannel], message_id: Optional[str]):
+    async def send_in_judging_log(self, ctx, txt):
+        channel = dget(ctx.message.guild.channels, id=config['judging_log_channel_id']) # get log channel
+        await channel.send(txt)
 
-        print("what", channel, type(channel))
-        print(message_id, type(message_id))
 
-        print(0)
+    async def get_confirmation(self, confirm_user, confirm_msg):
+        await confirm_msg.add_reaction("✅")
+        await confirm_msg.add_reaction("❌")
+        # TODO: consider char limit
 
-        logging.info(f"make_judging_queues called with channel={channel}, message_id={message_id}.")
+        def check(reaction, user):
+            return user == confirm_user and reaction.emoji in ["✅", "❌"]
 
-        print(1)
+        # waiting for reaction confirmation
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=20.0) # 20 second timeout
+        except asyncio.TimeoutError:
+            await confirm_msg.reply("Timed out waiting for confirmation; rerun the command if you want to try again.")
+            return None
+
+        if reaction.emoji == "✅":
+            return True
+        else:
+            return False
+    
+
+    @commands.command(help=f'''Usage: `{config['prefix']}make_queues`.''')
+    async def make_queues(self, ctx, channel: Optional[discord.TextChannel], message_id: Optional[str]):
+
+        if not check_author_perms(ctx):
+            return
+
+        logging.info(f"make_queues called with channel={channel}, message_id={message_id}.")
 
         # hastily check arguments
         if channel == None or not message_id.isdigit(): 
@@ -51,8 +119,6 @@ class Judging(commands.Cog):
 
         # get the judging message
         judging_msg = await channel.fetch_message(message_id)
-
-        print(2)
 
         team_choices = {} # map team name : [each emoji reacted by a member of the team]
         non_team_reacts = []
@@ -81,8 +147,8 @@ class Judging(commands.Cog):
                     # member not in team
                     non_team_reacts.append(reaction)
 
-        logging.info(f"make_judging_queues team_choices={team_choices}")
-        logging.info(f"make_judging_queues ignored {len(non_team_reacts)} reacts")
+        logging.info(f"make_queues team_choices={team_choices}")
+        logging.info(f"make_queues ignored {len(non_team_reacts)} reacts")
 
         # ===== get highest-priority category for each team
 
@@ -103,7 +169,7 @@ class Judging(commands.Cog):
             choose_name = icon_to_name[choose_icon]
             team_to_category[team_name] = choose_name
         
-        logging.info(f"make_judging_queues team_to_category={team_to_category}")
+        logging.info(f"make_queues team_to_category={team_to_category}")
 
         # have done this in several steps so we could possibly implement some kind of preferential
         # sorting in future, not for now though. efficiency isn't a huge concern for this bot
@@ -144,16 +210,100 @@ class Judging(commands.Cog):
                 raise ValueError(f"Category {cat} has no possible rooms.") # this should not happen
                 # TODO: modify config checking
             
-        logging.info(f"make_judging_queues room_to_teams={room_to_teams}")
+        logging.info(f"make_queues room_to_teams={room_to_teams}")
 
-        print("?????")
+        # make a new dict with judging information
+        judging = {r: {"next_team": 0, "teams": room_to_teams[r]} for r in room_to_teams.keys()}
+
+        # send info message
+        await ctx.reply("This is a json file mapping the *room ID* (as specified in the config.json for this bot) to a list of *team names* (as in the Discord roles). Use it to start judging with the `start_judging` command (be careful with that though).")
 
         # send generated queue
-        send_as_json(ctx, room_to_teams, filename="judging_breakdown.json")
+        await send_as_json(ctx, judging, filename="judging_breakdown.json")
 
 
-    @commands.command(help=f'''Usage: `{config['prefix']}make_judging_queues`.''')
-    async def make_judging_queues(self, ctx, channel: Optional[discord.TextChannel], message_id: Optional[str]):
+    @commands.command(help=f'''Usage: `{config['prefix']}start_judging`.''')
+    async def start_judging(self, ctx):
 
-        print(channel, type(channel))
-        print(message_id, type(message_id))
+        if not check_author_perms(ctx):
+            return
+
+        logging.info(f"start_judging called.")
+
+        # normally checking for extraneous arguments wouldn't be important; i check them here because
+        # this is a sensitive command and incorrect usage might mean someone's messed something up in
+        # such a way that would cause judging to not go how they want
+        if ctx.message.content.strip() != "~start_judging" \
+            or len(ctx.message.attachments) != 1 \
+            or not ctx.message.attachments[0].filename.endswith(".json"):
+
+            await ctx.message.add_reaction("❌")
+            await ctx.reply("Judging was not started; this command must be called with no arguments and exactly one attachment (a json in the same format output by `make_queues`).")
+
+        # download the attachment
+        # im not a security expert but i can see this being a bit of a hazard. please do not hack my bot
+        filename = gen_filename("received", "json")
+        
+        with open(filename, "wb") as f:
+            await ctx.message.attachments[0].save(fp=f)
+
+        # validate file
+        try:
+            with open(filename, "r") as f:
+                judging = json.loads(f.read())
+
+            # get all teams for validation purposes
+            all_teams = await utils.get_all_team_roles(ctx)
+            team_names = [role.name for role in all_teams]
+
+            # some lazy validation. can't really check every possible issue here.
+            for room_id in judging.keys():
+                assert room_id in list(config["judging_rooms"].keys()), f"room id {room_id} not in config"
+                assert 0 <= judging[room_id]["next_team"], f"for room id {room_id}, next_team {judging[room_id]['next_team']} is invalid"
+
+                if len(judging[room_id]["teams"]) > 0:
+                    assert judging[room_id]["next_team"] < len(judging[room_id]["teams"]), f"for room id {room_id}, next_team {judging[room_id]['next_team']} is invalid"
+                
+                for name in judging[room_id]["teams"]:
+                    assert name in team_names, f"team name {name} in room id {room_id} does not exist"
+
+        except (ValueError, AssertionError, KeyError) as e:
+            # catch any issues, log them, and send to user
+            logging.error(e)
+            logging.info("Unable to read json.")
+
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Judging was not started; there's likely something wrong with your json. Make sure it matches the format of the output of `setup_queues`.\nError message: `{e}`")
+
+        # get confirmation
+        msg = "This is the judging scheme that you are about to switch to. Verify it is correct, and then react to this message with ✅ to confirm, or ❌ to cancel.\n\n"
+        msg += self.pprint_judging(judging)
+        confirm_msg = await ctx.message.reply(msg)
+
+        confirmed = await self.get_confirmation(ctx.message.author, confirm_msg)
+        if confirmed == None:
+            # timed out
+            return
+        elif confirmed == False:
+            # reacted with ❌
+            await confirm_msg.reply(f"Judging was not started.")
+            return
+        else:
+            await confirm_msg.reply(f"Judging started! ✨")
+
+        # otherwise, we are good to go with this judging
+        self.judging = judging
+
+        # send confirmation in judging log channel
+        msg = "Started new judging scheme.\n\n"
+        msg += self.pprint_judging(self.judging)
+        await self.send_in_judging_log(ctx, msg)
+
+
+    @commands.command(help=f'''Usage: `{config['prefix']}next <room_id>`.''')
+    async def next(self, ctx, channel: Optional[discord.TextChannel], message_id: Optional[str]):
+
+        if not check_author_perms(ctx):
+            return
+
+        

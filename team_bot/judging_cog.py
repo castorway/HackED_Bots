@@ -65,8 +65,17 @@ class Judging(commands.Cog):
             judging = self.judging
 
         for room_id, info in judging.items():
-            msg += f"\n{'[' + room_id + ']' :16} | next={info['next_team']}\n"
+            # room status
+            if info['next_team'] == 0:
+                status = "Not Started"
+            elif info["next_team"] < len(info["teams"]):
+                status = "In Progress"
+            else:
+                status = "Done"
+            
+            msg += f"\n{'[' + room_id + ']' :16} | next={info['next_team']} ({status})\n"
 
+            # print each team
             for i, team_name in enumerate(judging[room_id]["teams"]):
                 if i == info["next_team"] - 1:
                     msg += f"= {team_name} =\n"
@@ -295,7 +304,7 @@ class Judging(commands.Cog):
         self.judging = judging
 
         # send confirmation in judging log channel
-        msg = "Started new judging scheme.\n\n"
+        msg = "Started new judging scheme.\n"
         msg += self.pprint_judging(self.judging)
         await self.send_in_judging_log(ctx, msg)
 
@@ -313,9 +322,21 @@ class Judging(commands.Cog):
             await ctx.reply(f"Queue was not moved; room ID {room_id} either does not exist or has no participants being judged in it.")
             return
 
-        elif self.judging[room_id]["next_team"] >= len(self.judging[room_id]["teams"]):
+        elif self.judging[room_id]["next_team"] > len(self.judging[room_id]["teams"]):
             await ctx.message.add_reaction("❌")
             await ctx.reply(f"Queue was not moved; there are no more participants to judge in this room.")
+            return
+
+        elif self.judging[room_id]["next_team"] == len(self.judging[room_id]["teams"]):
+            # finished with this room
+            await ctx.message.add_reaction("✅")
+            await ctx.reply(f"All teams have now been judged for room `{room_id}`. ✨")
+            self.judging[room_id]["next_team"] += 1
+
+            # log change
+            msg = f"All teams have now been judged for room `{room_id}`.\n"
+            msg += self.pprint_judging(self.judging)
+            await self.send_in_judging_log(ctx, msg)
             return
         
         # move queue along
@@ -331,4 +352,9 @@ class Judging(commands.Cog):
 
         # if in-person...
 
-        # log in 
+        # log change
+        msg = f"Moved room `{room_id}` along in judging and pinged `{team_name}`.\n"
+        msg += self.pprint_judging(self.judging)
+        await self.send_in_judging_log(ctx, msg)
+
+        await ctx.message.add_reaction("✅")

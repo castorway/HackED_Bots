@@ -54,6 +54,9 @@ class Judging(commands.Cog):
         self.bot = bot
         self.judging = {}
 
+        self.judging_type_msg = None
+        self.judging_category_msg = None
+
 
     def pprint_judging(self, judging=None):
         msg = "```asciidoc\n"
@@ -113,18 +116,53 @@ class Judging(commands.Cog):
             return False
     
 
+    @commands.command(help=f'''Usage: ~set_judging_react_messages <#channel> <type_message_id> <category_message_id>''')
+    async def set_judging_react_messages(self, ctx, channel: discord.TextChannel, type_msg_id: str, category_msg_id: str):
+        ''' Adds reactions to two messages to act as judging type (online/in-person) and special categories reaction choice menus. '''
+
+        if not check_author_perms(ctx): return
+        logging.info(f"set_judging_react_messages called with channel={channel}, type_msg_id={type_msg_id}, category_msg_id={category_msg_id}.")
+        
+        # verify both messages exist
+        try:
+            type_msg = await channel.fetch_message(type_msg_id)
+            category_msg = await channel.fetch_message(category_msg_id)
+        except discord.error.NotFound as e:
+            await ctx.message.add_reaction("❌")
+            await ctx.reply("Messages were not set; one or both messages could not be found. Check the channel and IDs again.")
+
+        # type (online or in-person)
+        await type_msg.add_reaction(config["in-person_react"])
+        await type_msg.add_reaction(config["online_react"])
+        
+        # special categories
+        for cat in config["judging_categories"]:
+            await category_msg.add_reaction(cat["react"])
+
+        self.judging_type_msg = type_msg
+        self.judging_category_msg = category_msg
+
+        logging.info(f"Set judging_type_msg={self.judging_type_msg}")
+        logging.info(f"Set judging_category_msg={self.judging_category_msg}")
+        await ctx.message.add_reaction("✅")
+
+
     @commands.command(help=f'''Usage: `{config['prefix']}make_queues`.''')
-    async def make_queues(self, ctx, channel: Optional[discord.TextChannel], message_id: Optional[str]):
+    async def make_queues(self, ctx):
+        '''
+        Automatically generate judging queues for judging rooms defined in config.json, based on the 
+        reactions to self.judging_type_msg and self.judging_category_msg.
+        
+        Requires `set_judging_react_messages` to have been run first.
+        '''
 
-        if not check_author_perms(ctx):
-            return
-
+        if not check_author_perms(ctx): return
         logging.info(f"make_queues called with channel={channel}, message_id={message_id}.")
 
-        # hastily check arguments
-        if channel == None or not message_id.isdigit(): 
-            await ctx.reply(f"Something's wrong with your arguments.")
-            return
+        # check we have the messages necessary to make queues
+        if self.judging_type_msg == None or self.judging_category_msg == None:
+            await ctx.message.add_reaction("❌")
+            await ctx.reply("Judging type and category messages haven't been set yet. Ensure you run `set_judging_react_messages` before this command.")
 
         # get the judging message
         judging_msg = await channel.fetch_message(message_id)
@@ -344,17 +382,15 @@ class Judging(commands.Cog):
         self.judging[room_id]["next_team"] += 1
 
         # ping the next group in judging ping channel
+
         channel = dget(ctx.message.guild.channels, id=config["judging_ping_channel_id"])
         team_role = dget(ctx.message.guild.roles, name=team_name)
-        await channel.send(f"hey {team_role.mention}, its judging time!")
 
-        # if online...
+        if config["judging_rooms"]["room_id"]["type"] == "online":
+            msg = f"Hey {team_role.mention}, you're up next for judging! You are being judged **online**. Please join {config['judging_rooms']['room_id']['channel']} when you are ready."
+        elif config["judging_rooms"]["room_id"]["type"] == "in-person":
+            msg = f"Hey {team_role.mention}, you're up next for judging! You are being judged **in-person**. Please report to the front desk, where you will be directed to your judging room."
 
-        # if in-person...
+        await channel.send(msg) # send ping
 
-        # log change
-        msg = f"Moved room `{room_id}` along in judging and pinged `{team_name}`.\n"
-        msg += self.pprint_judging(self.judging)
-        await self.send_in_judging_log(ctx, msg)
-
-        await ctx.message.add_reaction("✅")
+        await ctx.message.add_reaction("✅") # react to original command

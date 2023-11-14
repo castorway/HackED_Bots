@@ -1,5 +1,6 @@
 {
     "prefix": "~",
+    "embed_colour": "#18f8e6",
 
     "team_create_channel_id": 1165756636711886869,
     "roles": {
@@ -16,37 +17,44 @@
     "judging_log_channel_id": 1173821955523231835,
     "judging_ping_channel_id": 1173835289328885841,
 
+    "in-person_react": "🏢",
+    "online_react": "💻",
+
     "judging_categories": [
         {
-            "name": "in-person",
-            "react": "🏢"
-        },
-        {
-            "name": "online",
-            "react": "💻"
+            "name": "default",
+            "react": "⭐"
         },
         {
             "name": "mecsimcalc",
             "react": "⚙️"
+        },
+        {
+            "name": "edi",
+            "react": "🌈"
         }
     ],
 
     "judging_rooms": {
         "online1": {
             "channel": 1173389613763670086,
-            "category": "online"
+            "category": "online",
+            "type": "online"
         },
         "online2": {
             "channel": 1173389657812238337,
-            "category": "online"
+            "category": "online",
+            "type": "online"
         },
         "inperson1": {
             "location": "DICE 8F 8-01",
-            "category": "in-person"
+            "category": "in-person",
+            "type": "in-person"
         },
         "mecsimcalc": {
             "channel": 1173389682298589184,
-            "category": "mecsimcalc"
+            "category": "mecsimcalc",
+            "type": "online"
         }
     }
 }

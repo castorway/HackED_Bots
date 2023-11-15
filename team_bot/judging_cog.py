@@ -106,7 +106,12 @@ class Judging(commands.Cog):
         return channel
     
 
-    @commands.command(help=f'''Usage: ~set_judging_react_messages <#channel> <medium_message_id> <category_message_id>''')
+    @commands.command(help=f'''Sets the judging react messages that will be used if `auto_make_queue` is called. Restricted.
+    Usage: {config['prefix']}set_judging_react_messages <#channel> <medium_message_id> <category_message_id>
+    
+    * medium_message_id   : the ID of the message where participants can react with {config['inperson_react']} for in-person judging, or {config['online_react']} for online judging.
+    * category_message_id : the ID of the message where participants can react with one of {', '.join([info['react'] for cat, info in config['judging_categories'].items() if cat != 'default'])} for special judging categories.
+    * channel             : the channel where both messages are located.''')
     async def set_judging_react_messages(self, ctx, channel: discord.TextChannel, medium_msg_id: str, category_msg_id: str):
         ''' Adds reactions to two messages to act as judging medium (online/inperson) and special categories reaction choice menus. '''
 
@@ -180,7 +185,8 @@ class Judging(commands.Cog):
         return team_choices
 
 
-    @commands.command(help=f'''Usage: `{config['prefix']}auto_make_queues`.''')
+    @commands.command(help=f'''Automatically generate judging queues, based on the judging rooms defined in this bot's config and the reactions to the messages set using the `set_judging_react_messages` command. Restricted.
+    Usage: {config['prefix']}auto_make_queues''')
     async def auto_make_queues(self, ctx):
         '''
         Automatically generate judging queues for judging rooms defined in config.json, based on the 
@@ -276,7 +282,9 @@ class Judging(commands.Cog):
         await ctx.send(file=discord.File(queue_log_name, filename="queue_log.txt"))
 
 
-    @commands.command(help=f'''Usage: `{config['prefix']}start_judging`.''')
+    @commands.command(help=f'''Starts the judging process using the contents of the json file attached. This will completely discard any judging process that is currently being run, and the bot will start off with the configuration described in the json. Restricted.
+    Usage: {config['prefix']}start_judging
+    (The message must have a json file attached with the judging breakdown, in the same format as the json output of `auto_make_queues`.)''')
     async def start_judging(self, ctx):
 
         if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
@@ -356,7 +364,9 @@ class Judging(commands.Cog):
         await self.send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
 
 
-    @commands.command(help=f'''Usage: `{config['prefix']}next <room_id>`.''')
+    @commands.command(help=f'''Moves the judging queue along for the room associated with the text channel this command was run in (as described in the config). Restricted.
+    Usage: {config['prefix']}next
+    (Must be run in a text channel associated with a judging room.)''')
     async def next(self, ctx, room_id: str):
 
         if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
@@ -488,7 +498,9 @@ class Judging(commands.Cog):
         await confirm_msg.reply(f"Queue was incremented, and `{team_name}` was pinged in {team_text.mention} and told to report to {team_location}.")
 
 
-    @commands.command(help=f'''Usage: `{config['prefix']}vcpull`.''')
+    @commands.command(help=f'''Moves all participants in the waiting VC to the judging VC, for waiting/judging rooms associated with the text channel this command was run in. Restricted.
+    Usage: {config['prefix']}vcpull
+    (Must be run in a text channel associated with a judging room.)''')
     async def vcpull(self, ctx):
 
         if not utils.check_perms(ctx.message.author, config["perms"]["can_vcpull"]):

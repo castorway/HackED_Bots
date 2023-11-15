@@ -12,7 +12,7 @@ import utils
 
 config = utils.general_setup()
 
-class TeamCreate(commands.Cog):
+class Teams(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -138,21 +138,19 @@ class TeamCreate(commands.Cog):
         logging.info(f"Team created: {team_name}, {[m.name for m in team_members]}, {team_role}")
 
 
-    @commands.command(help=f'''Usage: `{config['prefix']}teams_info`. Only usable by Organizer role.''')
+    @commands.command(help=f'''Sends information about all teams currently created on the server. Restricted.
+    Usage: {config['prefix']}teams_info''')
     async def teams_info(self, ctx):
-        '''
-        Prints information about team.
-        '''
 
-        # ignore if user not an organizer
-        for role in ctx.author.roles:
-            if role.id == config['roles']['organizer']:
-                break
-        else:
+        # check permissions
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_teams_info"]):
+            logging.info(f"next: ignoring nonpermitted call by {ctx.message.author.name}")
             return
+        
+        logging.info(f"teams_info: called")
 
         msg = f"```asciidoc\n"
-        msg += f"TEAM INFO\n"
+        msg += f"TEAMS\n"
         msg += f"==========================\n"
 
         for role in ctx.guild.roles:

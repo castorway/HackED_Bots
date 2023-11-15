@@ -24,7 +24,8 @@
     "perms": {
         "can_control_judging": ["organizer"],
         "can_vcpull": ["organizer", "volunteer", "judge"],
-        "can_create_team": ["participant"]
+        "can_create_team": ["participant"],
+        "can_teams_info": ["organizer", "volunteer"]
     },
 
     "judging_categories": {

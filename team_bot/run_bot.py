@@ -21,7 +21,7 @@ import atexit
 from utils import general_setup
 
 # cogs
-from team_cog import TeamCreate
+from team_cog import Teams
 from judging_cog import Judging
 
 load_dotenv() # load env vars, like token
@@ -45,7 +45,7 @@ bot = Bot(command_prefix=config['prefix'], intents=intents)
 
 # add cogs
 async def setup(bot: commands.Bot):
-    await bot.add_cog(TeamCreate(bot))
+    await bot.add_cog(Teams(bot))
     await bot.add_cog(Judging(bot))
 
 @bot.event

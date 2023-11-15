@@ -24,7 +24,7 @@
     "judging_categories": {
         "default": {
             "rooms": {
-                "online": ["online1", "online2"],
+                "online": ["online1"],
                 "inperson": ["inperson1"]
             }
         },
@@ -49,8 +49,7 @@
             "medium": "online",
             "text": 1174416035428974673,
             "waiting_vc": 1174415929682182266,
-            "judging_vc": 1173389613763670086,
-            "role": 
+            "judging_vc": 1173389613763670086
         },
         "online2": {
             "medium": "online",

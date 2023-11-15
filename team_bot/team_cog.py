@@ -80,6 +80,12 @@ class TeamCreate(commands.Cog):
                     await ctx.message.add_reaction("❌")
                     await ctx.reply(f"Your team was not created; at least one member is already in a team.")
                     return
+                
+        # ensure team name only uses ASCII characters (some fancy characters will break things later on, and i dont like taking risks)
+        if not all(ord(c) < 128 for c in team_name):
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Your team was not created, because it uses invalid characters.")
+            return
 
         # create team category & role
         team_cat = await ctx.guild.create_category(name=team_name) # category to store team text & vc

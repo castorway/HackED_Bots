@@ -1,12 +1,16 @@
+'''
+This cog contains commands related to team creation and joining/leaving a team.get_co
+'''
+
 import discord
 from discord.ext import commands
 from typing import Optional
 from discord.utils import get as dget
 import logging
 from datetime import datetime
-from utils import general_setup
+import utils
 
-config = general_setup()
+config = utils.general_setup()
 
 class TeamCreate(commands.Cog):
     def __init__(self, bot):
@@ -19,32 +23,37 @@ class TeamCreate(commands.Cog):
                     logging.warning(f"Team role name {team_name} doesn't have team colour.")
                 return True # regardless of colour
 
-    # @commands.Cog.listener()
-    # async def on_ready(self):
-    #     print(f'Logged in as {bot.user}')
 
-
-    @commands.command(help=f'''Usage: {config['prefix']}team SomeTeamName @teammate1 @teammate2 @teammate3
-    Adds all pinged teammates to the team 'SomeTeamName'.''')
-    async def team(self, ctx):
-        """ Creates a new team with the mentioned users. """
+    @commands.command(help=f'''Creates a new team for the hackathon including all pinged teammates.
+    Usage: {config['prefix']}create_team <team_name> *<teammates>
+    
+    Example: `{config['prefix']}`create_team MyTeam @teammate1 @teammate2 @teammate3
+    Creates the team `MyTeam` and adds the three pinged teammates.''')
+    async def create_team(self, ctx, team_name: str, *team_members: discord.User):
+        ''' 
+        Creates a new team with the mentioned users. Performs a bunch of validation to try and avoid pesky
+        team name issues later on.
+        '''
 
         # ignore if command not issued in team-create channel
         if ctx.message.channel.id != config['team_create_channel_id']:
-            print("Ignoring ~team called outside team-create channel")
+            logging.info("Ignoring ~team called outside team-create channel")
             return
+        
+        # check permissions
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_create_team"]):
+            logging.info(f"next: ignoring nonpermitted call by {ctx.message.author.name}")
+            return
+        
+        logging.info(f"create_team: called with team_name {team_name}, team_members {team_members}")
 
-        team_name = ctx.message.content.split(' ')[1] # get team name
-        team_members = list(set([member for member in ctx.message.mentions])) # get unique mentions of users
-
-        logging.info(f"team called with team_name {team_name}, team_members {team_members}")
+        team_members = list(set([m for m in team_members])) # get unique mentions of users
 
         for member in team_members:
-
-            # ctx.message.mentions already disincludes role mentions, need to disinclude bots
+            # already disincludes role mentions, need to disinclude bots
             if member.bot:
                 await ctx.message.add_reaction("❌")
-                await ctx.reply(f"Your team was not created; you cannot have a bot on your team!")
+                await ctx.reply(f"Your team was not created; you cannot have a bot on your team.")
                 return
 
             # ensure user not already in team
@@ -57,7 +66,17 @@ class TeamCreate(commands.Cog):
         # ensure team name not already taken
         if self.team_exists(ctx, team_name):
             await ctx.message.add_reaction("❌")
-            await ctx.reply(f"Your team was not created; there is already a team with the name '{team_name}'.")
+            await ctx.reply(f"Your team was not created; there is already a team with the name `{team_name}`.")
+            return
+        
+        # ensure team name won't cause conflicts with anything already in the server
+        if dget(ctx.message.guild.channels, name=team_name) \
+            or dget(ctx.message.guild.categories, name=team_name) \
+            or dget(ctx.message.guild.channels, name=team_name) \
+            or dget(ctx.message.guild.roles, name=team_name):
+
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Your team was not created; the name `{team_name}` is not allowed.")
             return
         
         # ensure number of participants under limit
@@ -69,23 +88,27 @@ class TeamCreate(commands.Cog):
         # check for empty team
         if len(team_members) == 0:
             await ctx.message.add_reaction("❌")
-            await ctx.reply(f"Your team was not created; you cannot have an empty team!")
+            await ctx.reply(f"Your team was not created; you cannot have an empty team.")
             return
-        
-        # ensure all participants aren't already in a team
-        for member in team_members:
-            for role in member.roles:
-                if role.color == config['team_role_colour_obj']:
-                    logging.info(f"Team {team_name} not created because member {member} already in team.")
-                    await ctx.message.add_reaction("❌")
-                    await ctx.reply(f"Your team was not created; at least one member is already in a team.")
-                    return
                 
         # ensure team name only uses ASCII characters (some fancy characters will break things later on, and i dont like taking risks)
         if not all(ord(c) < 128 for c in team_name):
             await ctx.message.add_reaction("❌")
-            await ctx.reply(f"Your team was not created, because it uses invalid characters.")
+            await ctx.reply(f"Your team was not created; the name `{team_name}` uses invalid characters.")
             return
+        
+        # get confirmation from sender
+        confirm_msg = await ctx.reply(f"The team `{team_name}` will be created, and members {' '.join([m.mention for m in team_members])} will be added.\n{ctx.message.author.mention} Please react to this message with ✅ to confirm, or ❌ to cancel.")
+        confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
+
+        if confirmed == None:
+            # timed out
+            return
+        elif confirmed == False:
+            # reacted with ❌
+            await confirm_msg.reply(f"Team {team_name} was not created.")
+            return
+        # otherwise, user confirmed, so we can proceed
 
         # create team category & role
         team_cat = await ctx.guild.create_category(name=team_name) # category to store team text & vc
@@ -117,6 +140,9 @@ class TeamCreate(commands.Cog):
 
     @commands.command(help=f'''Usage: `{config['prefix']}teams_info`. Only usable by Organizer role.''')
     async def teams_info(self, ctx):
+        '''
+        Prints information about team.
+        '''
 
         # ignore if user not an organizer
         for role in ctx.author.roles:

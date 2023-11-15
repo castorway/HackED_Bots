@@ -39,19 +39,6 @@ class Judging(commands.Cog):
         return data_dir / f"{tag}_{timestamp}.{ext}"
 
 
-    def check_perms(self, user, allowed_roles):
-        """ 
-        Checks that user has one of the roles in `allowed_roles` (which is a list containing string names
-        of roles, as they appear in the config).
-        """
-        allowed_ids = [config["roles"][r] for r in allowed_roles]
-        for role in user.roles:
-            if role.id in allowed_ids:
-                return True
-        else:
-            return False
-
-
     async def send_as_json(self, ctx, dictionary, filename):
         # make file
         save_filename = self.gen_filename("generated", "json")
@@ -117,34 +104,13 @@ class Judging(commands.Cog):
     async def get_judging_log(self, ctx):
         channel = dget(ctx.message.guild.channels, id=config['judging_log_channel_id']) # get log channel
         return channel
-
-
-    async def get_confirmation(self, confirm_user, confirm_msg):
-        await confirm_msg.add_reaction("✅")
-        await confirm_msg.add_reaction("❌")
-        # TODO: consider char limit
-
-        def check(reaction, user):
-            return user == confirm_user and reaction.emoji in ["✅", "❌"]
-
-        # waiting for reaction confirmation
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=20.0) # 20 second timeout
-        except asyncio.TimeoutError:
-            await confirm_msg.reply("Timed out waiting for confirmation; rerun the command if you want to try again.")
-            return None
-
-        if reaction.emoji == "✅":
-            return True
-        else:
-            return False
     
 
     @commands.command(help=f'''Usage: ~set_judging_react_messages <#channel> <medium_message_id> <category_message_id>''')
     async def set_judging_react_messages(self, ctx, channel: discord.TextChannel, medium_msg_id: str, category_msg_id: str):
         ''' Adds reactions to two messages to act as judging medium (online/inperson) and special categories reaction choice menus. '''
 
-        if not self.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
             logging.info(f"set_judging_react_messages: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
@@ -223,7 +189,7 @@ class Judging(commands.Cog):
         Requires `set_judging_react_messages` to have been run first.
         '''
 
-        if not self.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
             logging.info(f"auto_make_queues: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
@@ -313,7 +279,7 @@ class Judging(commands.Cog):
     @commands.command(help=f'''Usage: `{config['prefix']}start_judging`.''')
     async def start_judging(self, ctx):
 
-        if not self.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
             logging.info(f"start_judging: ignoring nonpermitted call by {ctx.message.author.name}")
             return
 
@@ -368,8 +334,8 @@ class Judging(commands.Cog):
         msg = "This is the judging scheme that you are about to switch to. Verify it is correct, and then react to this message with ✅ to confirm, or ❌ to cancel.\n\n"
         msg += self.pprint_judging(judging)
         confirm_msg = await ctx.message.reply(msg)
+        confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
 
-        confirmed = await self.get_confirmation(ctx.message.author, confirm_msg)
         if confirmed == None:
             # timed out
             return
@@ -377,11 +343,10 @@ class Judging(commands.Cog):
             # reacted with ❌
             await confirm_msg.reply(f"Judging was not started.")
             return
-        else:
-            await confirm_msg.reply(f"Judging started! ✨")
-
+        
         # otherwise, we are good to go with this judging
         self.judging = judging
+        await confirm_msg.reply(f"Judging started! ✨")
 
         # send confirmation in judging log channel
         msg = "Started new judging scheme.\n"
@@ -394,7 +359,7 @@ class Judging(commands.Cog):
     @commands.command(help=f'''Usage: `{config['prefix']}next <room_id>`.''')
     async def next(self, ctx, room_id: str):
 
-        if not self.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
             logging.info(f"next: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
@@ -451,9 +416,7 @@ class Judging(commands.Cog):
 
         # get confirmation
         confirm_msg = await ctx.message.reply(f"The queue for room {room_id} will be incremented, meaning {team_name} will be next to be judged. React to this message with ✅ to confirm, or ❌ to cancel.")
-        await confirm_msg.add_reaction("✅")
-        await confirm_msg.add_reaction("❌")
-        confirmed = await self.get_confirmation(ctx.message.author, confirm_msg)
+        confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
 
         if confirmed == None:
             # timed out
@@ -528,7 +491,7 @@ class Judging(commands.Cog):
     @commands.command(help=f'''Usage: `{config['prefix']}vcpull`.''')
     async def vcpull(self, ctx):
 
-        if not self.check_perms(ctx.message.author, config["perms"]["can_vcpull"]):
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_vcpull"]):
             logging.info(f"vcpull: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         

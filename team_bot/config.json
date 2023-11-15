@@ -21,6 +21,11 @@
     "online_react": "💻",
     "default_judging_medium_pref": "online",
 
+    "perms": {
+        "can_control_judging": ["organizer"],
+        "can_vcpull": ["organizer", "volunteer", "judge"]
+    },
+
     "judging_categories": {
         "default": {
             "rooms": {

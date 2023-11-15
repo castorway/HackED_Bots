@@ -22,35 +22,7 @@ file_path = Path(os.path.realpath(__file__)).parents[0] # path to this directory
 data_dir = file_path / "judging"
 os.makedirs(data_dir, exist_ok=True)
 
-
-# global storing current judging dict; room ids mapped to position and list of team names
-current_judging = {}
-
-
-def gen_filename(tag, ext):
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    return data_dir / f"{tag}_{timestamp}.{ext}"
-
-
-def check_author_perms(ctx):
-    """ All the commands in this cog should only be usable by users with the organizer role. """
-    for role in ctx.author.roles:
-        if role.id == config['roles']['organizer']:
-            return True
-    else:
-        return False
-
-
-async def send_as_json(ctx, dictionary, filename):
-    temp_name = Path("./_temp.json")
-
-    # make file
-    save_filename = gen_filename("generated", "json")
-    with open(save_filename, "w") as f:
-        f.write(json.dumps(dictionary, indent=4))
-
-    # send file
-    await ctx.send(file=discord.File(save_filename, filename=filename))
+# lazy configuration for who's allowed to do what
 
 
 class Judging(commands.Cog):
@@ -60,6 +32,34 @@ class Judging(commands.Cog):
 
         self.judging_medium_msg = None
         self.judging_category_msg = None
+
+
+    def gen_filename(self, tag, ext):
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        return data_dir / f"{tag}_{timestamp}.{ext}"
+
+
+    def check_perms(self, user, allowed_roles):
+        """ 
+        Checks that user has one of the roles in `allowed_roles` (which is a list containing string names
+        of roles, as they appear in the config).
+        """
+        allowed_ids = [config["roles"][r] for r in allowed_roles]
+        for role in user.roles:
+            if role.id in allowed_ids:
+                return True
+        else:
+            return False
+
+
+    async def send_as_json(self, ctx, dictionary, filename):
+        # make file
+        save_filename = self.gen_filename("generated", "json")
+        with open(save_filename, "w") as f:
+            f.write(json.dumps(dictionary, indent=4))
+
+        # send file
+        await ctx.send(file=discord.File(save_filename, filename=filename))
 
 
     def get_team_artefacts(self, ctx, team_name):
@@ -113,11 +113,6 @@ class Judging(commands.Cog):
         
         return msg
 
-
-    def my_log(self, log_file, txt):
-        with open(log_file, "a") as f:
-            f.write(txt + "\n")
-
     
     async def get_judging_log(self, ctx):
         channel = dget(ctx.message.guild.channels, id=config['judging_log_channel_id']) # get log channel
@@ -149,8 +144,11 @@ class Judging(commands.Cog):
     async def set_judging_react_messages(self, ctx, channel: discord.TextChannel, medium_msg_id: str, category_msg_id: str):
         ''' Adds reactions to two messages to act as judging medium (online/inperson) and special categories reaction choice menus. '''
 
-        if not check_author_perms(ctx): return
-        logging.info(f"set_judging_react_messages called with channel={channel}, medium_msg_id={medium_msg_id}, category_msg_id={category_msg_id}.")
+        if not self.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+            logging.info(f"set_judging_react_messages: ignoring nonpermitted call by {ctx.message.author.name}")
+            return
+        
+        logging.info(f"set_judging_react_messages: called with channel={channel}, medium_msg_id={medium_msg_id}, category_msg_id={category_msg_id}.")
         
         # verify both messages exist
         try:
@@ -158,7 +156,7 @@ class Judging(commands.Cog):
             category_msg = await channel.fetch_message(category_msg_id)
         except:
             await ctx.message.add_reaction("❌")
-            await ctx.reply("Messages were not set; one or both messages could not be found. Check the channel and IDs again.")
+            await ctx.reply("set_judging_react_messages: Messages were not set; one or both messages could not be found. Check the channel and IDs again.")
 
         # medium (online or inperson)
         await medium_msg.add_reaction(config["inperson_react"])
@@ -173,8 +171,8 @@ class Judging(commands.Cog):
         self.judging_medium_msg = medium_msg
         self.judging_category_msg = category_msg
 
-        logging.info(f"Set judging_medium_msg={self.judging_medium_msg}")
-        logging.info(f"Set judging_category_msg={self.judging_category_msg}")
+        logging.info(f"set_judging_react_messages: Set judging_medium_msg={self.judging_medium_msg}")
+        logging.info(f"set_judging_react_messages: Set judging_category_msg={self.judging_category_msg}")
         await ctx.message.add_reaction("✅")
 
 
@@ -225,20 +223,23 @@ class Judging(commands.Cog):
         Requires `set_judging_react_messages` to have been run first.
         '''
 
-        if not check_author_perms(ctx): return
-        logging.info(f"auto_make_queues called.")
+        if not self.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+            logging.info(f"auto_make_queues: ignoring nonpermitted call by {ctx.message.author.name}")
+            return
+        
+        logging.info(f"auto_make_queues: called.")
 
         # check we have the messages necessary to make queues
         if self.judging_medium_msg == None or self.judging_category_msg == None:
             await ctx.message.add_reaction("❌")
-            await ctx.reply("Judging medium and category messages haven't been set yet. Ensure you run `set_judging_react_messages` before this command.")
+            await ctx.reply("auto_make_queues: Judging medium and category messages haven't been set yet. Ensure you run `set_judging_react_messages` before this command.")
 
         # add special queue logger just for this <3
         root_logger = logging.getLogger()
         main_log_handler = root_logger.handlers[0]
         root_logger.removeHandler(main_log_handler) # remove the main log handler temporarily
 
-        queue_log_name = gen_filename("autoqueue", ".txt")
+        queue_log_name = self.gen_filename("autoqueue", ".txt")
         queue_log_handler = logging.FileHandler(queue_log_name)
         formatter = logging.Formatter('%(message)s')
         queue_log_handler.setFormatter(formatter)
@@ -249,12 +250,10 @@ class Judging(commands.Cog):
         medium_icons = [config["inperson_react"], config["online_react"]]
         category_icons = [info["react"] for cat, info in config["judging_categories"].items() if cat != "default"]
 
-        logging.info("===== get_team_reacts =====")
         team_medium_reacts = await self.get_team_reacts(self.judging_medium_msg, accepted_icons=medium_icons)
         team_category_reacts = await self.get_team_reacts(self.judging_category_msg, accepted_icons=category_icons)
-        logging.info("===========================")
 
-        logging.info("Reactions pulled from the judging messages, by-team:")
+        logging.info("auto_make_queues: Reactions pulled from the judging messages, by-team:")
         logging.info(pformat(team_medium_reacts, indent=4))
         logging.info(pformat(team_category_reacts, indent=4))
 
@@ -297,7 +296,7 @@ class Judging(commands.Cog):
         }
         
         # remove special queue logger
-        logging.info("Finished auto-generating queue.")
+        logging.info("auto_make_queues: Finished auto-generating queue.")
         queue_log_handler.close()
         root_logger.removeHandler(queue_log_handler)
         root_logger.addHandler(main_log_handler)
@@ -306,7 +305,7 @@ class Judging(commands.Cog):
         await ctx.reply("This is a json file mapping the *room ID* (as specified in the config.json for this bot) to a list of *team names* (as in the Discord roles), as well as a txt log file for the algorithm. Check the txt log file to make sure everything looks right, modify the json as desired, and then use the json to start judging with the `start_judging` command (be careful with that though).")
 
         # send generated queue
-        await send_as_json(ctx, judging, filename="judging_breakdown.json")
+        await self.send_as_json(ctx, judging, filename="judging_breakdown.json")
 
         await ctx.send(file=discord.File(queue_log_name, filename="queue_log.txt"))
 
@@ -314,10 +313,11 @@ class Judging(commands.Cog):
     @commands.command(help=f'''Usage: `{config['prefix']}start_judging`.''')
     async def start_judging(self, ctx):
 
-        if not check_author_perms(ctx):
+        if not self.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+            logging.info(f"start_judging: ignoring nonpermitted call by {ctx.message.author.name}")
             return
 
-        logging.info(f"start_judging called.")
+        logging.info(f"start_judging: called.")
 
         # normally checking for extraneous arguments wouldn't be important; i check them here because
         # this is a sensitive command and incorrect usage might mean someone's messed something up in
@@ -331,7 +331,7 @@ class Judging(commands.Cog):
 
         # download the attachment
         # im not a security expert but i can see this being a bit of a hazard. please do not hack my bot
-        filename = gen_filename("received", "json")
+        filename = self.gen_filename("received", "json")
         
         with open(filename, "wb") as f:
             await ctx.message.attachments[0].save(fp=f)
@@ -359,7 +359,7 @@ class Judging(commands.Cog):
         except (ValueError, AssertionError, KeyError) as e:
             # catch any issues, log them, and send to user
             logging.error(e)
-            logging.info("Unable to read json.")
+            logging.info("start_judging: Unable to read json.")
 
             await ctx.message.add_reaction("❌")
             await ctx.reply(f"Judging was not started; there's likely something wrong with your json. Make sure it matches the format of the output of `setup_queues`.\nError message: `{e}`")
@@ -388,13 +388,14 @@ class Judging(commands.Cog):
         msg += self.pprint_judging(self.judging)
         judging_log = await self.get_judging_log(ctx)
         await judging_log.send(msg)
-        await send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
+        await self.send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
 
 
     @commands.command(help=f'''Usage: `{config['prefix']}next <room_id>`.''')
     async def next(self, ctx, room_id: str):
 
-        if not check_author_perms(ctx):
+        if not self.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+            logging.info(f"next: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
         logging.info(f"next: run with room_id={room_id}")
@@ -436,7 +437,7 @@ class Judging(commands.Cog):
             msg += self.pprint_judging(self.judging)
 
             await judging_log.send(msg)
-            await send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
+            await self.send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
             return
         
         elif self.judging[room_id]["next_team"] > len(self.judging[room_id]["teams"]):
@@ -517,7 +518,7 @@ class Judging(commands.Cog):
         msg += self.pprint_judging(self.judging)
 
         await judging_log.send(msg)
-        await send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
+        await self.send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
 
         await ctx.message.add_reaction("✅") # react to original command
 
@@ -527,11 +528,31 @@ class Judging(commands.Cog):
     @commands.command(help=f'''Usage: `{config['prefix']}vcpull`.''')
     async def vcpull(self, ctx):
 
-        if not check_author_perms(ctx):
+        if not self.check_perms(ctx.message.author, config["perms"]["can_vcpull"]):
+            logging.info(f"vcpull: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
         logging.info(f"vcpull: run")
 
         # check channel
+        cid = ctx.channel.id
+        for room, info in config["judging_rooms"]:
+            if "text" in info.keys() and info["text"] == cid:
+                logging.info(f"vcpull: was run in channel for {room}")
 
-       
+                # command was run in the text channel for a particular room
+                waiting_vc = dget(ctx.guild.channels, id=info["waiting_vc"])
+                judging_vc = dget(ctx.guild.channels, id=info["waiting_vc"])
+
+                # move everyone in the waiting_vc into the judging_vc
+                print(waiting_vc.voice_states)
+
+                for member in waiting_vc.voice_states.values():
+                    await member.move_to(judging_vc)
+
+                await ctx.message.add_reaction("✅") # react to original command
+                break
+
+        else:
+            await ctx.message.add_reaction("❌") # react to original command
+            await ctx.message.reply("Make sure you are running this command in the text channel associated with a judging room.")

@@ -62,6 +62,18 @@ class Judging(commands.Cog):
         self.judging_category_msg = None
 
 
+    def get_team_artefacts(self, ctx, team_name):
+        team_cat = dget(ctx.message.guild.categories, name=team_name)
+        print(team_cat.channels)
+
+        team_text = [c for c in team_cat.channels if type(c) == discord.TextChannel][0]
+        team_vc = [c for c in team_cat.channels if type(c) == discord.VoiceChannel][0]\
+        
+        team_role = dget(ctx.message.guild.roles, name=team_name)
+
+        return team_role, team_cat, team_text, team_vc
+
+
     def pprint_judging(self, judging=None):
         msg = "```asciidoc\n"
         msg += f"JUDGING\n"
@@ -99,9 +111,9 @@ class Judging(commands.Cog):
             f.write(txt + "\n")
 
     
-    async def send_in_judging_log(self, ctx, txt):
+    async def get_judging_log(self, ctx):
         channel = dget(ctx.message.guild.channels, id=config['judging_log_channel_id']) # get log channel
-        await channel.send(txt)
+        return channel
 
 
     async def get_confirmation(self, confirm_user, confirm_msg):
@@ -387,21 +399,66 @@ class Judging(commands.Cog):
             msg += self.pprint_judging(self.judging)
             await self.send_in_judging_log(ctx, msg)
             return
-        
-        # move queue along
+
         team_name = self.judging[room_id]["teams"][ self.judging[room_id]["next_team"] ]
+
+        # get confirmation
+        confirm_msg = await ctx.message.reply(f"The queue for room {room_id} will be incremented, meaning {team_name} will be next to be judged. React to this message with ✅ to confirm, or ❌ to cancel.")
+        confirmed = self.get_confirmation(ctx.author, )
+
+        if confirmed == None:
+            # timed out
+            return
+        elif confirmed == False:
+            # reacted with ❌
+            await confirm_msg.reply(f"Queue was not incremented.")
+            return
+        
+        # else confirmed == True, continue with code
+
+        # move queue along
         self.judging[room_id]["next_team"] += 1
 
-        # ping the next group in judging ping channel
+        # flag so we know if we need to remove prev team's permissions
+        if self.judging[room_id]["next_team"] > 0:
+            prev_team = self.judging[room_id]["teams"][ self.judging[room_id]["next_team"] - 1 ]
+        else:
+            prev_team = None
 
-        channel = dget(ctx.message.guild.channels, id=config["judging_ping_channel_id"])
-        team_role = dget(ctx.message.guild.roles, name=team_name)
+        try:
+            # get the team role and text channel. text channels have weird name restrictions so you need to get the
+            # category and then get the channel from that
+            team_role, team_cat, team_text, team_vc = self.get_team_artefacts(ctx, team_name)
+        except (commands.CategoryNotFoundError, commands.RoleNotFoundError) as e:
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"There was an issue getting the category or role for this team; you need to handle pinging and VC permissions manually for them.")
+            return
+        
 
-        if config["judging_rooms"]["room_id"]["medium"] == "online":
-            msg = f"Hey {team_role.mention}, you're up next for judging! You are being judged **online**. Please join {config['judging_rooms']['room_id']['waiting_vc']} as soon as possible."
-        elif config["judging_rooms"]["room_id"]["medium"] == "inperson":
-            msg = f"Hey {team_role.mention}, you're up next for judging! You are being judged **in-person**. Please report to the front desk as soon as possible, from where you will be directed to your judging room."
+        if config["judging_rooms"][room_id]["medium"] == "online":
+            await team_text.send(f"Hey {team_role.mention}, you're up next for judging! You are being judged **online**. Please join {config['judging_rooms']['room_id']['waiting_vc']} as soon as possible.")
+            
+            # we also need to give the team access to the waiting room
+            waiting_vc = dget(ctx.message.guild.channels, id=config[room_id]["waiting_vc"])
+            await waiting_vc.set_permissions(team_role, read_messages=True) # team can view waiting room
 
-        await channel.send(msg) # send ping
+            # get the previous team and remove their permissions, if there was one
+            if prev_team != None:
+                prev_role, prev_cat, prev_text, prev_vc = self.get_team_artefacts(ctx, prev_team)
+                await waiting_vc.set_permissions(prev_role, read_messages=False) # prev team can't view waiting room
+
+            waiting_vc = dget(ctx.message.guild.channels, id=config["judging_ping_channel_id"])
+
+        
+        elif config["judging_rooms"][room_id]["medium"] == "inperson":
+            await team_text.send(f"Hey {team_role.mention}, you're up next for judging! You are being judged **in-person**. Please report to the front desk as soon as possible, from where you will be directed to your judging room.")
+
+        # log progress and send new json
+        judging_log = self.get_judging_log(ctx)
+        msg = f"Moved queue along for room {room_id}; currently {team_name} is being judged.\n"
+        msg += self.pprint_judging(self.judging)
+        await judging_log.send(msg)
+        await send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
 
         await ctx.message.add_reaction("✅") # react to original command
+        await confirm_msg.reply(f"Queue was incremented, and {team_name} was pinged in {team_text}.")

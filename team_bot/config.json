@@ -46,16 +46,26 @@
 
     "judging_rooms": {
         "online1": { 
-            "waiting_vc": 1173389613763670086
+            "medium": "online",
+            "text": 1174416035428974673,
+            "waiting_vc": 1174415929682182266,
+            "judging_vc": 1173389613763670086,
+            "role": 
         },
         "online2": {
-            "waiting_vc": 1173389657812238337
+            "medium": "online",
+            "text": 1174416214055981086,
+            "waiting_vc": 1174416248101163109,
+            "judging_vc": 1174416275687096551
         },
         "inperson1": {
             "location": "DICE 8F 8-01"
         },
         "msc1": {
-            "waiting_vc": 1173389613763670086
+            "medium": "online",
+            "text": 1174417543922978916,
+            "waiting_vc": 1174417580941922314,
+            "judging_vc": 1174417612923473970
         },
         "msc2": {
             "location": "DICE 8F 8-02"

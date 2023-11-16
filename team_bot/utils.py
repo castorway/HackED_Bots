@@ -40,7 +40,7 @@ async def get_all_team_roles(ctx):
     return teams
 
 
-async def get_confirmation(bot: discord.Bot, confirm_user: discord.User, confirm_msg: discord.Message):
+async def get_confirmation(bot: discord.ext.commands.Bot, confirm_user: discord.User, confirm_msg: discord.Message):
     '''
     Waits for `confirm_user` to react to `confirm_message`.
     If the user reacts with ✅, it returns True.

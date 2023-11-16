@@ -1,5 +1,5 @@
 '''
-This cog contains commands related to team creation and joining/leaving a team.get_co
+This cog contains commands related to team creation and joining/leaving a team.
 '''
 
 import discord
@@ -18,18 +18,16 @@ class Teams(commands.Cog):
 
     def team_exists(self, ctx: discord.ext.commands.Context, team_name: str):
         for role in ctx.guild.roles:
-            if role.name == team_name:
-                if role.color != config['team_role_colour_obj']:
-                    logging.warning(f"Team role name {team_name} doesn't have team colour.")
-                return True # regardless of colour
+            if role.name == team_name and role.color == config['team_role_colour_obj']:
+                return True
 
 
     @commands.command(help=f'''Creates a new team for the hackathon including all pinged teammates.
     Usage: {config['prefix']}create_team <team_name> *<teammates>
     
-    Example: `{config['prefix']}`create_team MyTeam @teammate1 @teammate2 @teammate3
+    Example: {config['prefix']}create_team MyTeam @teammate1 @teammate2 @teammate3
     Creates the team `MyTeam` and adds the three pinged teammates.''')
-    async def create_team(self, ctx, team_name: str, *team_members: discord.User):
+    async def create_team(self, ctx):
         ''' 
         Creates a new team with the mentioned users. Performs a bunch of validation to try and avoid pesky
         team name issues later on.
@@ -45,9 +43,20 @@ class Teams(commands.Cog):
             logging.info(f"next: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
-        logging.info(f"create_team: called with team_name {team_name}, team_members {team_members}")
 
-        team_members = list(set([m for m in team_members])) # get unique mentions of users
+        # to get the team name, this splits the message at the first space (to chop off the "~create_team"),
+        # and then at the first '<' character (which preceeds a mention)
+        x = ctx.message.content.split(maxsplit=1)
+        if len(x) < 2:
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Your team was not created; something is wrong with your command. Run `{config['prefix']}help create_team` for the command usage.")
+            return
+        team_name = x[1].split('<', maxsplit=1)[0].strip()
+        
+        # get unique mentions of users for the team members
+        team_members = list(set([m for m in ctx.message.mentions]))
+
+        logging.info(f"create_team: called with team_name {team_name}, team_members {[m.name for m in team_members]}")
 
         for member in team_members:
             # already disincludes role mentions, need to disinclude bots
@@ -62,6 +71,15 @@ class Teams(commands.Cog):
                     await ctx.message.add_reaction("❌")
                     await ctx.reply(f"Your team was not created; at least one member is already in a team.")
                     return
+            
+            # ensure user is a participant
+            for role in member.roles:
+                if role.id == config["roles"]["participant"]:
+                    break
+            else:
+                await ctx.message.add_reaction("❌")
+                await ctx.reply(f"Your team was not created; at least one member does not have the `@Participant` role.")
+                return
             
         # ensure team name not already taken
         if self.team_exists(ctx, team_name):
@@ -98,7 +116,7 @@ class Teams(commands.Cog):
             return
         
         # get confirmation from sender
-        confirm_msg = await ctx.reply(f"The team `{team_name}` will be created, and members {' '.join([m.mention for m in team_members])} will be added.\n{ctx.message.author.mention} Please react to this message with ✅ to confirm, or ❌ to cancel.")
+        confirm_msg = await ctx.reply(f"The team `{team_name}` will be created, and members {' '.join([m.mention for m in team_members])} will be added.\n\n{ctx.message.author.mention}, please react to this message with ✅ to confirm, or ❌ to cancel.")
         confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
 
         if confirmed == None:

@@ -25,7 +25,8 @@
         "can_control_judging": ["organizer"],
         "can_vcpull": ["organizer", "volunteer", "judge"],
         "can_create_team": ["participant"],
-        "can_teams_info": ["organizer", "volunteer"]
+        "can_teams_info": ["organizer", "volunteer"],
+        "can_switch_phase": ["organizer"]
     },
 
     "judging_categories": {
@@ -65,7 +66,8 @@
             "judging_vc": 1174416275687096551
         },
         "inperson1": {
-            "location": "DICE 8F 8-01"
+            "location": "DICE 8F 8-01",
+            "text": 11
         },
         "msc1": {
             "medium": "online",
@@ -74,10 +76,12 @@
             "judging_vc": 1174417612923473970
         },
         "msc2": {
-            "location": "DICE 8F 8-02"
+            "location": "DICE 8F 8-02",
+            "text": 11
         },
         "dive1": {
-            "location": "DICE 8F 8-02"
+            "location": "DICE 8F 8-02",
+            "text": 11
         }
     }
 }

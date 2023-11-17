@@ -23,6 +23,7 @@ import utils
 # cogs
 from team_cog import Teams
 from judging_cog import Judging
+from misc_cog import Misc
 
 
 load_dotenv() # load env vars, like token
@@ -48,6 +49,7 @@ bot = Bot(command_prefix=config['prefix'], intents=intents)
 async def setup(bot: commands.Bot):
     await bot.add_cog(Teams(bot))
     await bot.add_cog(Judging(bot))
+    await bot.add_cog(Misc(bot))
 
 @bot.event
 async def on_ready():

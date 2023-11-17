@@ -84,13 +84,16 @@ class Judging(commands.Cog):
                 msg += f"\n[{room_id} \"{room_display_name}\"][{status} (current_team = {info['current_team']})]\n"
 
             # print each team
-            for i, team_name in enumerate(info["teams"]):
+            for i in range(len(info["teams"])):
+                team_name = info["teams"][i]
+                extra = "" if public else f" ({info['extra'][i]})"
+
                 if i < info["current_team"]:
-                    msg += f"- {team_name}\n"
+                    msg += f"- {team_name}{extra}\n"
                 elif i == info["current_team"]:
-                    msg += f"> {team_name}\n"
+                    msg += f"> {team_name}{extra}\n"
                 else:
-                    msg += f"* {team_name}\n"
+                    msg += f"* {team_name}{extra}\n"
         
         msg += "```"
         
@@ -232,7 +235,7 @@ class Judging(commands.Cog):
                 logging.info("auto_make_queues: Reactions pulled from the judging messages, by-team:")
                 logging.info(pformat(team_category_reacts, indent=4))
 
-                room_to_teams = queuing.category_priority(team_category_reacts) # some queuing algorithm
+                room_to_teams, room_to_extra = queuing.category_priority(team_category_reacts) # some queuing algorithm
                 teams_registered = team_category_reacts.keys()
 
             else:
@@ -244,7 +247,8 @@ class Judging(commands.Cog):
             judging = {
                 room_id: {
                     "current_team": -1, # signifies that no team is currently in room
-                    "teams": room_to_teams[room_id]
+                    "teams": room_to_teams[room_id],
+                    "extra": room_to_extra[room_id]
                 }
                 for room_id in room_to_teams.keys()
             }
@@ -486,7 +490,7 @@ class Judging(commands.Cog):
         logging.info(f"tick: run with room_id={room_id}")
 
         # check special cases where we can't move queue
-        if self.judging[room_id]["current_team"] == len(self.judging[room_id]["teams"]):
+        if self.judging[room_id]["current_team"] == len(self.judging[room_id]["teams"]) - 1:
             # this is being run while the final team is being judged
             logging.info(f"tick: final team is being judged in `{room_id}`, updating log")
             
@@ -503,9 +507,11 @@ class Judging(commands.Cog):
 
             await judging_log.send(msg)
             await self.send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
+
+            await self.update_public_judging_log(ctx)
             return
         
-        elif self.judging[room_id]["current_team"] > len(self.judging[room_id]["teams"]):
+        elif self.judging[room_id]["current_team"] > len(self.judging[room_id]["teams"]) - 1:
             # this is being run after `tick` already run for final team
             logging.info(f"tick: `{room_id}` has no more participants to judge")
             await ctx.message.add_reaction("❌")
@@ -601,12 +607,18 @@ class Judging(commands.Cog):
         skip_team_idx = self.judging[room_id]["current_team"] + 1 # index of team to skip (next team)
         skip_team_name = self.judging[room_id]["teams"][skip_team_idx]
 
+        # i know this is inefficient, this bot doesn't need to be running at maximum efficiency tbh
         new_queue = deepcopy(self.judging[room_id]["teams"][:skip_team_idx]) \
                     + deepcopy(self.judging[room_id]["teams"][skip_team_idx+1:]) \
-                    + [skip_team_name]
+                    + [ self.judging[room_id]["teams"][skip_team_idx] ]
+
+        new_extra = deepcopy(self.judging[room_id]["extra"][:skip_team_idx]) \
+                    + deepcopy(self.judging[room_id]["extra"][skip_team_idx+1:]) \
+                    + [ self.judging[room_id]["extra"][skip_team_idx] + " (skipped)" ]
 
         mock_judging = deepcopy(self.judging)
         mock_judging[room_id]["teams"] = new_queue
+        mock_judging[room_id]["extra"] = new_extra
 
         # get confirmation
         msg = f"Team `{skip_team_name}` will be skipped and appended to the end of the queue. The team will be notified that they have been skipped. The new queue will look like this:\n"
@@ -643,7 +655,7 @@ class Judging(commands.Cog):
             return
         
         team_role, team_cat, team_text, team_vc = ret
-        team_text.send(f"{team_role.mention} We didn't see you report for judging, so we've skipped your team for now and moved you to the end of our judging queue. If you don't make it when pinged again for your second call time, we will have to exclude your project from the judging.")
+        await team_text.send(f"{team_role.mention} We didn't see you report for judging, so we've skipped your team for now and moved you to the end of our judging queue. If you don't make it when pinged again for your second call time, we will have to exclude your project from the judging.")
 
         await ctx.message.add_reaction("✅") # react to original command
 

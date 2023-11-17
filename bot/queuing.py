@@ -35,6 +35,7 @@ def category_priority(team_category_reacts):
         logging.info(msg)
 
     room_to_teams = {r: [] for r in config["judging_rooms"].keys()}
+    room_to_extra = {r: [] for r in config["judging_rooms"].keys()} # any extra info about team to print in private judging logs
 
     # sort categories into available rooms for that category
     for c in ordered_cats:
@@ -52,11 +53,12 @@ def category_priority(team_category_reacts):
 
         for i, room in enumerate(config["judging_categories"][c]["rooms"]):
             room_to_teams[room] += list(split_by_room[i])
+            room_to_extra[room] += [config["judging_categories"][c]["react"]] * len(split_by_room[i])
             msg += f"\n=== {room} ===\n{', '.join(split_by_room[i])}"
 
         logging.info(msg)
     
-    return room_to_teams
+    return room_to_teams, room_to_extra
 
 
 def original_queue_algorithm(team_category_choice, team_medium_pref):

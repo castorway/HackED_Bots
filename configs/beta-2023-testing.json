@@ -1,5 +1,6 @@
 {
     "prefix": "~",
+    "controller_id": 366769320275083276,
     
     "team_create_channel_id": 1165756636711886869,
     "roles": {
@@ -13,8 +14,8 @@
     "max_team_participants": 5,
     "team_role_colour": "#adadad",
 
-    "judging_log_channel_id": 1173821955523231835,
-    "judging_ping_channel_id": 1173835289328885841,
+    "private_judging_log_channel_id": 1173821955523231835,
+    "public_judging_log_channel_id": 1173835289328885841,
 
     "perms": {
         "can_control_judging": ["organizer"],

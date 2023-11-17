@@ -30,7 +30,7 @@ class Judging(commands.Cog):
 
     async def send_as_json(self, ctx, dictionary, filename):
         # make file
-        save_filename = utils.gen_filename("generated", "json")
+        save_filename = utils.gen_filename("autoqueue", "json")
         with open(save_filename, "w") as f:
             f.write(json.dumps(dictionary, indent=4))
 
@@ -56,11 +56,14 @@ class Judging(commands.Cog):
         return (team_role, team_cat, team_text, team_vc)
 
 
-    def pprint_judging(self, judging=None):
+    def pprint_judging(self, judging=None, public=False):
         msg = "```md\n"
         msg += f"JUDGING\n"
         msg += f"==========================\n"
-        msg += f"The team highlighted in <green> is the *current team* that is being judged (if any). The team after it is the team that will be pinged when `next <room_id>` is run.\n"
+        if public:
+            msg += f"The team highlighted in <green> is the current team being judged (if any). If you are one of the next few teams, we encourage you to report to the front desk (for in-person team members) or your team VC (for online team members) in advance.\n\n"
+        else:
+            msg += f"The team highlighted in <green> is the *current team* that is being judged (if any). The team after it is the team that will be pinged when `~ping <room_id>` is run.\n\n"
 
         if judging == None:
             judging = self.judging
@@ -74,7 +77,11 @@ class Judging(commands.Cog):
             else:
                 status = "Done"
             
-            msg += f"\n[{room_id}][{status} (current={info['current_team']})]\n"
+            room_display_name = config["judging_rooms"][room_id]['display_name']
+            if public:
+                msg += f"[{room_display_name}][{status}]\n"
+            else:
+                msg += f"\n[{room_id} \"{room_display_name}\"][{status} (current_team = {info['current_team']})]\n"
 
             # print each team
             for i, team_name in enumerate(info["teams"]):
@@ -91,8 +98,51 @@ class Judging(commands.Cog):
 
     
     async def get_judging_log(self, ctx):
-        channel = dget(ctx.message.guild.channels, id=config['judging_log_channel_id']) # get log channel
+        channel = dget(ctx.message.guild.channels, id=config['private_judging_log_channel_id']) # get log channel
         return channel
+
+    
+    async def update_public_judging_log(self, ctx):
+        '''
+        Sends the current judging log to a public channel.
+        '''
+        channel = dget(ctx.message.guild.channels, id=config['public_judging_log_channel_id']) # get log channel
+        await channel.send(self.pprint_judging(public=True))
+
+    
+    async def set_team_timer(self, ctx, room_id):
+        '''
+        Starts a timer to repeatedly pester the bot controller when a team should be pinged. Assumes this command is
+        run right when the team starts presenting.
+        '''
+        controller = dget(ctx.guild.members, id=config["controller_id"])
+        room_channel = dget(ctx.guild.channels, id=config["judging_rooms"][room_id]["text"])
+        team_name = self.judging[room_id]["teams"][ self.judging[room_id]["current_team"] ]
+        
+        await room_channel.send(f"{controller.mention}, a timer has been started assuming `{team_name}` has just started presenting. Ping the next team so they are ready once `{team_name}` is done.")
+        
+        await asyncio.sleep(60 * 2) # ping them again after 2m
+
+        # if something changed, leave
+        if self.judging[room_id]["teams"][ self.judging[room_id]["current_team"] ] != team_name:
+            logging.info(f"team_timer: left because team {team_name} no longer being judged")
+            return
+        await room_channel.send(f"{controller.mention}, it's been **2** minutes since `{team_name}` started presenting. Ping the next team again so they are ready once `{team_name}` is done.")
+
+        await asyncio.sleep(60 * 2) # after 4m, ping both them and the team after them
+
+        # if something changed, leave
+        if self.judging[room_id]["teams"][ self.judging[room_id]["current_team"] ] != team_name:
+            logging.info(f"team_timer: left because team {team_name} no longer being judged")
+            return
+        await room_channel.send(f"{controller.mention}, it's been **4** minutes since `{team_name}` started presenting.\nIf the next team isn't ready, ping both them and the team after.")
+
+        await asyncio.sleep(60 * 1) # after 5m, allotted time is up
+
+        if self.judging[room_id]["teams"][ self.judging[room_id]["current_team"] ] != team_name:
+            logging.info(f"team_timer: left because team {team_name} no longer being judged")
+            return
+        await room_channel.send(f"{controller.mention}, it's been **5** minutes since {team_name} started presenting, which means their time is up.\nWrap up the presentation, and if there's a team ready to go then send them in.")
     
 
     async def get_team_reacts(self, message, accepted_icons):
@@ -157,7 +207,7 @@ class Judging(commands.Cog):
         root_logger = logging.getLogger()
         main_log_handler = root_logger.handlers[0]
 
-        queue_log_name = utils.gen_filename("autoqueue", ".txt")
+        queue_log_name = utils.gen_filename("autoqueue_log", ".txt")
         queue_log_handler = logging.FileHandler(queue_log_name)
         formatter = logging.Formatter('%(message)s')
         queue_log_handler.setFormatter(formatter)
@@ -305,13 +355,16 @@ class Judging(commands.Cog):
         await judging_log.send(msg)
         await self.send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
 
+        await self.update_public_judging_log(ctx) # and in public judging log
+
 
     @commands.command(help=f'''Pings the next team to be judged in a particular room. Restricted.
                       
     Usage: {config['prefix']}ping <room_id>
+    Usage: {config['prefix']}ping <room_id> <team_name>
     
     (The command must be run in the text channel matching <room_id>.)''')
-    async def ping(self, ctx, room_id: str):
+    async def ping(self, ctx, room_id: str, team_name: Optional[str]):
 
         # check permissions
         if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
@@ -332,28 +385,34 @@ class Judging(commands.Cog):
         
         logging.info(f"ping: run with room_id={room_id}")
 
-        # check special cases where there is no team to ping
-        if self.judging[room_id]["current_team"] == len(self.judging[room_id]["teams"]) - 1:
-            # this is being run while the current team being judged is last in the queue
-            logging.info(f"ping: run while final team being judged, not pinging anyone")
-            await ctx.message.add_reaction("❌")
-            await ctx.reply(f"Team was not pinged; the current team being judged is the final team in the queue.")
-            return
-        elif self.judging[room_id]["current_team"] > len(self.judging[room_id]["teams"]) - 1:
-            # this is being run after all teams have been judged
-            logging.info(f"ping: run once queue over, not pinging anyone")
-            await ctx.message.add_reaction("❌")
-            await ctx.reply(f"Team was not pinged; judging has finished for this room.")
-            return
+        if team_name == None:
+            # check special cases where there is no team to ping
+            if self.judging[room_id]["current_team"] == len(self.judging[room_id]["teams"]) - 1:
+                # this is being run while the current team being judged is last in the queue
+                logging.info(f"ping: run while final team being judged, not pinging anyone")
+                await ctx.message.add_reaction("❌")
+                await ctx.reply(f"Team was not pinged; the current team being judged is the final team in the queue.")
+                return
+            elif self.judging[room_id]["current_team"] > len(self.judging[room_id]["teams"]) - 1:
+                # this is being run after all teams have been judged
+                logging.info(f"ping: run once queue over, not pinging anyone")
+                await ctx.message.add_reaction("❌")
+                await ctx.reply(f"Team was not pinged; judging has finished for this room.")
+                return
         
-        # otherwise, this is being run while a team that is not last in the queue is being judged (or no team is being judged, i.e. current_team == -1)
-        # so we want to ping the team that comes after them
-        
-        next_team_idx = self.judging[room_id]["current_team"] + 1
-        team_name = self.judging[room_id]["teams"][next_team_idx]
+            # otherwise, this is being run while a team that is not last in the queue is being judged (or no team is being judged, i.e. current_team == -1)
+            # so we want to ping the team that comes after them
+
+            next_team_idx = self.judging[room_id]["current_team"] + 1
+            team_name = self.judging[room_id]["teams"][next_team_idx]
+
+            explain_msg = f"Team `{team_name}` is next in line for room `{room_id}` and will be pinged"
+
+        else:
+            explain_msg = f"Team `{team_name}` will be pinged"
 
         # get confirmation
-        confirm_msg = await ctx.message.reply(f"Team `{team_name}` is next in line for room `{room_id}` and will be pinged. React to this message with ✅ to confirm, or ❌ to cancel.")
+        confirm_msg = await ctx.message.reply(f"{explain_msg}. React to this message with ✅ to confirm, or ❌ to cancel.")
         confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
         if confirmed == None: # timed out
             return
@@ -385,8 +444,17 @@ class Judging(commands.Cog):
             success_msg += f"- Once they arrive at the front desk, please direct them to **{config['judging_rooms'][room_id]['location']}**, and inform the controller they have been directed to the room.\n"
             success_msg += f"- Once they arrive at {config['judging_rooms'][room_id]['location']}, please inform the controller they have begun presenting."
         
+        elif config["judging_rooms"][room_id]["medium"] == "hybrid":
+            await team_text.send(f"Hey {team_role.mention}, you're up next for judging!\n- For in-person team members: please report to the front desk as soon as possible, from where you will be directed to your judging room.\n- For online team members: please join {team_vc.mention} as soon as possible, and when the judges are ready you will be moved to the judging room.")
+            success_msg = f"Team `{team_name}` was pinged in {team_text.mention} and told to report to the front desk and/or {team_vc.mention}.\n"
+            success_msg += f"- Once in-person members arrive at the front desk: direct them to **{config['judging_rooms'][room_id]['location']}**, and inform the controller they have been directed to the room.\n"
+            success_msg += f"- Keep an eye on {team_vc.mention} to watch for online members joining their VC. Run `~vcpull {room_id}` or `~vcpull {room_id} {team_name}` to pull them into the judging VC.\n"
+            success_msg += f"- Once both in-person and online members are in the room, inform the bot controller they have begun presenting."
+
         else:
-            raise ValueError(f"config has invalid medium for `{room_id}`")
+            await ctx.message.add_reaction("❌")
+            await ctx.message.reply(f"Config has invalid medium for this judging room. You will have to ping the team manually.")
+            return
         
         # send confirmation
         await ctx.message.add_reaction("✅") # react to original command
@@ -483,8 +551,11 @@ class Judging(commands.Cog):
         await ctx.message.add_reaction("✅") # react to original command
         await confirm_msg.reply(f"Queue was moved. This means that {explain_msg}.")
 
+        await self.update_public_judging_log(ctx)
+        await self.set_team_timer(ctx, room_id)
+
     
-    @commands.command(help=f'''Skips the 'next team' in the judging queue for this room. The 'current team' remains unchanged. Restricted.
+    @commands.command(help=f'''Skips the 'next team' in the judging queue for this room and shunts them to the end of the queue. The 'current team' remains unchanged. Restricted.
                       
     Usage: {config['prefix']}skip <room_id>''')
     async def skip(self, ctx, room_id: str):
@@ -561,7 +632,7 @@ class Judging(commands.Cog):
         await judging_log.send(msg)
         await self.send_as_json(judging_log, self.judging, filename="judging_breakdown.json")
 
-        # notify team they have been skipped
+        # notify skipped team they have been skipped
 
         # get the team role and text channel
         ret = self.get_team_artefacts(ctx, skip_team_name)
@@ -575,6 +646,8 @@ class Judging(commands.Cog):
         team_text.send(f"{team_role.mention} We didn't see you report for judging, so we've skipped your team for now and moved you to the end of our judging queue. If you don't make it when pinged again for your second call time, we will have to exclude your project from the judging.")
 
         await ctx.message.add_reaction("✅") # react to original command
+
+        await self.update_public_judging_log(ctx)
 
 
     @commands.command(help=f'''Moves all participants in the waiting VC to the judging VC, for waiting/judging rooms associated with the text channel this command was run in. Restricted.
@@ -635,10 +708,12 @@ class Judging(commands.Cog):
         team_role, team_cat, team_text, team_vc = ret
         judging_vc = dget(ctx.guild.channels, id=config["judging_rooms"][room_id]["judging_vc"])
 
-        members = team_vc.voice_states.keys() # people in the team vc
+        logging.info(team_vc.voice_states)
+        print(team_vc.voice_states)
+        member_ids = team_vc.voice_states.keys() # people in the team vc
 
         # get confirmation
-        confirm_msg = await ctx.reply(f"There are {len(members)} users in {team_vc.mention} right now who will be moved into {judging_vc.mention}. React to this message with ✅ to confirm, or ❌ to cancel.")
+        confirm_msg = await ctx.reply(f"There are {len(member_ids)} users in {team_vc.mention} right now who will be moved into {judging_vc.mention}. React to this message with ✅ to confirm, or ❌ to cancel.")
         confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
         if confirmed == None: # timed out
             return
@@ -647,7 +722,28 @@ class Judging(commands.Cog):
             return
 
         # move everyone into the judging_vc
-        for member in members:
+        for member_id in member_ids:
+            member = dget(ctx.guild.members, id=member_id)
             await member.move_to(judging_vc)
 
         await ctx.message.add_reaction("✅") # react to original command
+
+
+    @commands.command(help=f'''Quickly prints the judging queue. Restricted.
+    
+    Usage: {config['prefix']}q''')
+    async def q(self, ctx, public: Optional[str]):
+        '''
+        This is mostly here as a fast shortcut-ish command to be run when you don't want to switch to the private judging
+        log channel. Because you're either incredibly paranoid or just a hardcore gamer.
+        '''
+
+        # check permissions
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+            logging.info(f"q: ignoring nonpermitted call by {ctx.message.author.name}")
+            return
+        
+        if public != None:
+            await ctx.send(self.pprint_judging(public=True))
+        else:
+            await ctx.send(self.pprint_judging())

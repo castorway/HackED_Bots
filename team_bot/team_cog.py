@@ -15,11 +15,34 @@ args, config = utils.general_setup()
 class Teams(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.team_creation_enabled = True
 
     def team_exists(self, ctx: discord.ext.commands.Context, team_name: str):
         for role in ctx.guild.roles:
             if role.name == team_name and role.color == config['team_role_colour_obj']:
                 return True
+            
+
+    @commands.command(help=f'''Enables/disables team creation.
+    Usage: {config['prefix']}create_team <team_name> *<teammates>
+    
+    Example: {config['prefix']}create_team MyTeam @teammate1 @teammate2 @teammate3
+    Creates the team `MyTeam` and adds the three pinged teammates.''')
+    async def turn_team_creation(self, ctx, state: Optional[str]):
+
+        if state == "on":
+            self.team_creation_enabled = True
+            await ctx.message.add_reaction("✅")
+            await ctx.message.reply(f'Team creation enabled.')
+
+        elif state == "off":
+            self.team_creation_enabled = False
+            await ctx.message.add_reaction("✅")
+            await ctx.message.reply(f'Team creation disabled.')
+
+        else:
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Something was wrong with your command. This command can be run either as `~turn_team_creation on` or `~turn_team_creation off`.")
 
 
     @commands.command(help=f'''Creates a new team for the hackathon including all pinged teammates.
@@ -40,9 +63,15 @@ class Teams(commands.Cog):
         
         # check permissions
         if not utils.check_perms(ctx.message.author, config["perms"]["can_create_team"]):
-            logging.info(f"next: ignoring nonpermitted call by {ctx.message.author.name}")
+            logging.info(f"create_team: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
+        # if team creation disabled, exit
+        if not self.team_creation_enabled:
+            logging.info(f"create_team: ignoring because team creation is disabled")
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Team creation is disabled.")
+            return
 
         # to get the team name, this splits the message at the first space (to chop off the "~create_team"),
         # and then at the first '<' character (which preceeds a mention)
@@ -81,6 +110,13 @@ class Teams(commands.Cog):
                 await ctx.reply(f"Your team was not created; at least one member does not have the `@Participant` role.")
                 return
             
+        # no backticks because i goddamn said so (it'll break other formatting and make it look ugly)
+        if "`" in team_name:
+
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Your team was not created; please don't use backtick (`) characters in your team name.")
+            return
+
         # ensure team name not already taken
         if self.team_exists(ctx, team_name):
             await ctx.message.add_reaction("❌")

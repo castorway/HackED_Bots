@@ -38,17 +38,17 @@ When run, this command increments the bot's judging queue for the room identifie
 
 * Define all judging rooms in the config.
     * Ensure that a `text` channel is specified for all online *and* in-person judging rooms.
-    * Ensure that all in-person judging rooms have a `location` specified.
-    * Ensure that all online judging rooms have a `judging_vc` specified.
+        * Specifically ensure that the `judge` role cannot view the text channel. This is for messy commands and panicking about judging that the actual judges should not see.
+    * Ensure that all in-person judging rooms have a `location` specified, all online judging rooms have a `judging_vc` specified, and all hybrid judging rooms have both.
 
 ### Team Creation Phase
 
-* Run `~phase teams` to switch to the team creation phase. Judging-related commands will be disabled, and team-related commands will be enabled.
+* Run `~turn_team_creation on` to switch to the team creation phase.
     * During this phase, participants can create teams using `~create_team`.
 
 ### Judging Phase
 
-* Run `~phase judging` to switch to the judging phase. Judging-related commands will be enabled, and team-related commands will be disabled.
+* Run `~turn_team_creation off` to disable the `~create_team` command.
 * To automatically generate judging queues:
     * Run `~set_judging_react_messages` to tell the bot where the messages with judging-related reactions are.
     * Run `~auto_make_queues` to generate judging queues.
@@ -62,7 +62,7 @@ When run, this command increments the bot's judging queue for the room identifie
         * Runs `~skip` if a team takes does not report to the front desk (in-person) or enter their VC (online).
             * The controller should communicate with the exec in the room and/or exec at the desk to be sure that the team has not shown up before skipping them.
     * An "exec in the room", an organizer or volunteer in each judging room to inform the controller when a team has begun presenting.
-        * If online: Watches the next-up team's VC and runs `~vcpull` to move members from their VC to the judging room once all have joined their VC.
+        * If online/hybrid: Watches the next-up team's VC and runs `~vcpull` to move members from their VC to the judging room once they have joined their VC.
         * Pings the controller in their room's text channel once a team has arrived and begun presenting (or if a team is taking too long to arrive).
         * Watches the text channel associated with their room.
         * Generally moderates the room. Chats with the judges during quiet periods. Asks the team questions if the judges don't have any. Gently cuts the team off if they go overtime.

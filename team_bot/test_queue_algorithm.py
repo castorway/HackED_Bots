@@ -38,4 +38,17 @@ team_medium_pref = {
     "teamname6": "online"
 }
 
-queuing.queue_algorithm(team_category_choice, team_medium_pref)
+team_category_reacts = {
+    "hackers": ["⚙️"],
+    "hackers2": ["⚙️", "⭐"],
+    "aaa": ["⚙️", "⭐"],
+    "bbb": [],
+    "ccc": [],
+    "ddd": ["⭐"],
+    "eee": ["⭐"]
+}
+
+# queuing.queue_algorithm(team_category_choice, team_medium_pref)
+x = queuing.category_priority(team_category_reacts)
+
+print(x)

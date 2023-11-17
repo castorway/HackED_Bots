@@ -4,9 +4,62 @@ from utils import general_setup
 from copy import deepcopy
 import logging
 
-config = general_setup()
+args, config = general_setup()
 
-def queue_algorithm(team_category_choice, team_medium_pref):
+
+def category_priority(team_category_reacts):
+    '''
+    Teams are ordered based on category priority defined in config, then split evenly across any judging rooms.
+    '''
+
+    logging.info("category priority algorithm")
+
+    # go by category priority
+    ordered_cats = [c for c in config["judging_categories"].keys()]
+    ordered_cats = sorted(ordered_cats, key=lambda c: config["judging_categories"][c]["priority"] * -1) # higher numbers first in list
+    logging.info(f"sorted categories: {ordered_cats}")
+
+    cat_to_teams = {c: [] for c in ordered_cats}
+
+    # sort team_category_reacts into teams by category, prioritizing higher-priority categories
+    for team, reacts in team_category_reacts.items():
+        for c in ordered_cats:
+            if config["judging_categories"][c]["react"] in reacts:
+                cat_to_teams[c].append(team)
+                break
+        else:
+            logging.warning(f"team {team} with reacts {reacts} couldn't be put in a category, skipping")
+    
+    for c in ordered_cats:
+        msg = f"> teams whose highest-priority category is {c} {config['judging_categories'][c]['react']}: {', '.join(cat_to_teams[c])}"
+        logging.info(msg)
+
+    room_to_teams = {r: [] for r in config["judging_rooms"].keys()}
+
+    # sort categories into available rooms for that category
+    for c in ordered_cats:
+        logging.info(f"looking at category {c} with priority {config['judging_categories'][c]['priority']} and rooms {config['judging_categories'][c]['rooms']}")
+        
+        n_rooms = len(config["judging_categories"][c]["rooms"])
+        
+        if len(cat_to_teams[c]) == 0:
+            continue
+
+        np.random.shuffle(cat_to_teams[c])
+
+        split_by_room = np.array_split(cat_to_teams[c], n_rooms)
+        msg = f"teams assigned to each room for category {c} {config['judging_categories'][c]['react']}:"
+
+        for i, room in enumerate(config["judging_categories"][c]["rooms"]):
+            room_to_teams[room] += list(split_by_room[i])
+            msg += f"\n=== {room} ===\n{', '.join(split_by_room[i])}"
+
+        logging.info(msg)
+    
+    return room_to_teams
+
+
+def original_queue_algorithm(team_category_choice, team_medium_pref):
     '''
     One of many possible ways to do queueing. This way, teams are shuffled, and each in order is given their first
     choice for category + medium if possible (high-priority). Then, if a team has selected more than one special category,

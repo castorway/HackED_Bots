@@ -1,5 +1,6 @@
 '''
 This cog contains commands for switching the 'phase' of the bot (between team creation and judging).
+Not currently used.
 '''
 
 import discord
@@ -10,7 +11,7 @@ import logging
 from datetime import datetime
 import utils
 
-config = utils.general_setup()
+args, config = utils.general_setup()
 
 class Phase(commands.Cog):
     def __init__(self, bot):

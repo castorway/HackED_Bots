@@ -18,22 +18,23 @@ import logging
 from pathlib import Path
 from datetime import datetime
 import atexit
-from utils import general_setup
+import utils
 
 # cogs
 from team_cog import Teams
 from judging_cog import Judging
 
+
 load_dotenv() # load env vars, like token
-config = general_setup() # setup config
+args, config = utils.general_setup()
 
 # setup logging
 # TODO: move out of utils
 file_path = Path(os.path.realpath(__file__)).parents[0] # path to this directory
-log_handler = logging.FileHandler(filename=file_path / 'team_bot.log', encoding='utf-8', mode='w')
-logging.basicConfig(filename=file_path / 'team_bot.log',
-                    filemode='w',
-                    level=logging.DEBUG)
+# log_handler = logging.FileHandler(filename=file_path / 'current.log', encoding='utf-8', mode='w')
+# logging.basicConfig(filename=file_path / 'current.log',
+#                     filemode='w',
+#                     level=logging.DEBUG)
 
 class Bot(commands.Bot):
     def __init__(self, *argv, **kwargv):
@@ -51,6 +52,6 @@ async def setup(bot: commands.Bot):
 @bot.event
 async def on_ready():
     await setup(bot)
-    print(f'Logged in as {bot.user}')
+    print(f'Logged in as {bot.user} with config {args.config}')
 
-bot.run(os.environ['TEAMBOT_TOKEN'], log_handler=log_handler)
+bot.run(os.environ['TEAMBOT_TOKEN'], log_handler=logging.getLogger().handlers[0])

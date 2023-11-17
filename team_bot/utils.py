@@ -1,15 +1,36 @@
 import discord
+from discord.ext import commands
 from pathlib import Path
 import json
 import logging
 import os
 import asyncio
+from datetime import datetime
+import argparse
 
 file_path = Path(os.path.realpath(__file__)).parents[0] # path to this directory
 
+# setup args
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", "--config", required=True)
+parser.add_argument("-o", "--output_dir", default=file_path)
+args = parser.parse_args()
+
+output_dir = Path(args.output_dir)
+
+def gen_filename(tag, ext):
+        """
+        Generate a new filename with a timestamp to write data to.
+        """
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = output_dir / "generated" / tag / f"{tag}_{timestamp}.{ext}"
+        os.makedirs(file_name.parent, exist_ok=True) # doing this here because i will Definitely forget otherwise
+        return file_name
+
+
 def general_setup():
     # load config from json
-    with open(file_path / 'config.json', 'r') as f:
+    with open(args.config, 'r') as f:
         config = json.load(f)
 
     # additions
@@ -21,15 +42,18 @@ def general_setup():
         exit(0)
 
     # logging setup
-    log_handler = logging.FileHandler(filename=file_path / 'team_bot.log', encoding='utf-8', mode='w')
-    logging.basicConfig(filename=file_path / 'team_bot.log',
+    log_name = output_dir / gen_filename("log", "log")
+    # log_handler = logging.FileHandler(filename=log_name, encoding='utf-8', mode='w')
+    logging.basicConfig(filename=log_name,
                         filemode='w',
                         level=logging.DEBUG)
+    # root_logger = logging.getLogger()
+    # root_logger.addHandler(log_handler)
 
-    return config
+    return args, config
 
 
-config = general_setup()
+args, config = general_setup()
 
 
 async def get_all_team_roles(ctx):
@@ -40,7 +64,7 @@ async def get_all_team_roles(ctx):
     return teams
 
 
-async def get_confirmation(bot: discord.ext.commands.Bot, confirm_user: discord.User, confirm_msg: discord.Message):
+async def get_confirmation(bot: commands.Bot, confirm_user: discord.User, confirm_msg: discord.Message):
     '''
     Waits for `confirm_user` to react to `confirm_message`.
     If the user reacts with ✅, it returns True.

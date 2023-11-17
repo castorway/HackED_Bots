@@ -31,6 +31,7 @@
 
     "judging_categories": {
         "default": {
+            "react": "⭐",
             "rooms": {
                 "online": ["online1"],
                 "inperson": ["inperson1"]

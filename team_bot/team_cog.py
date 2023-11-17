@@ -10,7 +10,7 @@ import logging
 from datetime import datetime
 import utils
 
-config = utils.general_setup()
+args, config = utils.general_setup()
 
 class Teams(commands.Cog):
     def __init__(self, bot):

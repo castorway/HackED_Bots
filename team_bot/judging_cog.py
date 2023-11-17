@@ -13,17 +13,10 @@ import asyncio
 from pprint import pformat
 import itertools
 import numpy as np
-from queuing import queue_algorithm
+import queuing
 from copy import deepcopy
 
-config = utils.general_setup()
-
-# set up dirs for json files
-file_path = Path(os.path.realpath(__file__)).parents[0] # path to this directory
-data_dir = file_path / "judging"
-os.makedirs(data_dir, exist_ok=True)
-
-# lazy configuration for who's allowed to do what
+args, config = utils.general_setup()
 
 
 class Judging(commands.Cog):
@@ -35,14 +28,9 @@ class Judging(commands.Cog):
         self.judging_category_msg = None
 
 
-    def gen_filename(self, tag, ext):
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        return data_dir / f"{tag}_{timestamp}.{ext}"
-
-
     async def send_as_json(self, ctx, dictionary, filename):
         # make file
-        save_filename = self.gen_filename("generated", "json")
+        save_filename = utils.gen_filename("generated", "json")
         with open(save_filename, "w") as f:
             f.write(json.dumps(dictionary, indent=4))
 
@@ -107,48 +95,6 @@ class Judging(commands.Cog):
         return channel
     
 
-    @commands.command(help=f'''Sets the judging react messages that will be used if `auto_make_queue` is called. Restricted.
-    
-    Usage: {config['prefix']}set_judging_react_messages <#channel> <medium_message_id> <category_message_id>
-    
-    * medium_message_id   : the ID of the message where participants can react with {config['inperson_react']} for in-person judging, or {config['online_react']} for online judging.
-    * category_message_id : the ID of the message where participants can react with one of {', '.join([info['react'] for cat, info in config['judging_categories'].items() if cat != 'default'])} for special judging categories.
-    * channel             : the channel where both messages are located.''')
-    async def set_judging_react_messages(self, ctx, channel: discord.TextChannel, medium_msg_id: str, category_msg_id: str):
-        ''' Adds reactions to two messages to act as judging medium (online/inperson) and special categories reaction choice menus. '''
-
-        if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
-            logging.info(f"set_judging_react_messages: ignoring nonpermitted call by {ctx.message.author.name}")
-            return
-        
-        logging.info(f"set_judging_react_messages: called with channel={channel}, medium_msg_id={medium_msg_id}, category_msg_id={category_msg_id}.")
-        
-        # verify both messages exist
-        try:
-            medium_msg = await channel.fetch_message(medium_msg_id)
-            category_msg = await channel.fetch_message(category_msg_id)
-        except:
-            await ctx.message.add_reaction("❌")
-            await ctx.reply("set_judging_react_messages: Messages were not set; one or both messages could not be found. Check the channel and IDs again.")
-
-        # medium (online or inperson)
-        await medium_msg.add_reaction(config["inperson_react"])
-        await medium_msg.add_reaction(config["online_react"])
-        
-        # special categories
-        for cat, info in config["judging_categories"].items():
-            # no reaction for default category
-            if cat != "default":
-                await category_msg.add_reaction(info["react"])
-
-        self.judging_medium_msg = medium_msg
-        self.judging_category_msg = category_msg
-
-        logging.info(f"set_judging_react_messages: Set judging_medium_msg={self.judging_medium_msg}")
-        logging.info(f"set_judging_react_messages: Set judging_category_msg={self.judging_category_msg}")
-        await ctx.message.add_reaction("✅")
-
-
     async def get_team_reacts(self, message, accepted_icons):
         ''' Given a message, get the reactions to it in a dictionary separated by team. '''
         team_choices = {} # map team_name : [emojis reacted by team members]
@@ -183,92 +129,90 @@ class Judging(commands.Cog):
                     # member not in team
                     logging.info(f"get_team_reacts: ignored user {user} reacted with {reaction.emoji}, but has no team")
 
-        logging.info(team_choices)
         return team_choices
 
 
     @commands.command(help=f'''Automatically generate judging queues, based on the judging rooms defined in this bot's config and the reactions to the messages set using the `set_judging_react_messages` command. Restricted.
     
-    Usage: {config['prefix']}auto_make_queues''')
-    async def auto_make_queues(self, ctx):
+    Usage: {config['prefix']}auto_make_queues <algorithm> <channel> *[message_ids]
+    * algorithm : category_priority
+    ''')
+    async def auto_make_queues(self, ctx,
+        algorithm: str, 
+        channel: Optional[discord.TextChannel],
+        *react_msg_ids: str
+    ):
         '''
         Automatically generate judging queues for judging rooms defined in config.json, based on the 
-        reactions to self.judging_medium_msg and self.judging_category_msg.
-        
-        Requires `set_judging_react_messages` to have been run first.
+        reactions to messsages optionally provided.
         '''
 
         if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
             logging.info(f"auto_make_queues: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
-        logging.info(f"auto_make_queues: called.")
-
-        # check we have the messages necessary to make queues
-        if self.judging_medium_msg == None or self.judging_category_msg == None:
-            await ctx.message.add_reaction("❌")
-            await ctx.reply("auto_make_queues: Judging medium and category messages haven't been set yet. Ensure you run `set_judging_react_messages` before this command.")
+        logging.info(f"auto_make_queues: called with algorithm {algorithm}, channel {channel.name}, react_msg_ids {react_msg_ids}.")
 
         # add special queue logger just for this <3
         root_logger = logging.getLogger()
         main_log_handler = root_logger.handlers[0]
-        root_logger.removeHandler(main_log_handler) # remove the main log handler temporarily
 
-        queue_log_name = self.gen_filename("autoqueue", ".txt")
+        queue_log_name = utils.gen_filename("autoqueue", ".txt")
         queue_log_handler = logging.FileHandler(queue_log_name)
         formatter = logging.Formatter('%(message)s')
         queue_log_handler.setFormatter(formatter)
-        root_logger.addHandler(queue_log_handler)
 
-        # get information from messages
+        root_logger.removeHandler(main_log_handler) # remove the main log handler temporarily
+        root_logger.addHandler(queue_log_handler) # add a new handler
 
-        medium_icons = [config["inperson_react"], config["online_react"]]
-        category_icons = [info["react"] for cat, info in config["judging_categories"].items() if cat != "default"]
+        try:
 
-        team_medium_reacts = await self.get_team_reacts(self.judging_medium_msg, accepted_icons=medium_icons)
-        team_category_reacts = await self.get_team_reacts(self.judging_category_msg, accepted_icons=category_icons)
+            # different algorithms use different information
+            if algorithm == "category_priority":
+                # one message id, which should be category reactions
+                if len(react_msg_ids) != 1:
+                    await ctx.message.add_reaction("❌")
+                    await ctx.reply("The `category_priority` mode requires one message ID, which should be the ID participants react to with a category react.")
+                    return
+                
+                category_icons = [info["react"] for cat, info in config["judging_categories"].items()]
+                message = await channel.fetch_message(react_msg_ids[0])
+                team_category_reacts = await self.get_team_reacts(message, accepted_icons=category_icons)
 
-        logging.info("auto_make_queues: Reactions pulled from the judging messages, by-team:")
-        logging.info(pformat(team_medium_reacts, indent=4))
-        logging.info(pformat(team_category_reacts, indent=4))
+                logging.info("auto_make_queues: Reactions pulled from the judging messages, by-team:")
+                logging.info(pformat(team_category_reacts, indent=4))
 
-        # get all teams that reacted to either message
-        all_judgable_teams = list(set(list(team_medium_reacts.keys()) + list(team_category_reacts.keys())))
+                room_to_teams = queuing.category_priority(team_category_reacts) # some queuing algorithm
+                teams_registered = team_category_reacts.keys()
 
-        # === make some handy dicts
-
-        icon_to_category = {info["react"]: cat for cat, info in config["judging_categories"].items() if cat != "default"}
-
-        team_medium_pref = {} # map team to their preferred judging medium (online/inperson)
-        team_category_choice = {} # map team to all categories they reacted to (as icons)
-        
-        for team_name in all_judgable_teams:
-            if config["online_react"] in team_medium_reacts[team_name]:
-                team_medium_pref[team_name] = "online"
-            elif config["inperson_react"] in team_medium_reacts[team_name]:
-                team_medium_pref[team_name] = "inperson"
             else:
-                team_medium_pref[team_name] = config["default_judging_medium_pref"]
-            
-            # get unique categories chosen
-            if team_name in team_category_reacts.keys():
-                team_category_choice[team_name] = [icon_to_category[e] for e in list(set(team_category_reacts[team_name]))]
-            else:
-                team_category_choice[team_name] = []
+                await ctx.message.add_reaction("❌")
+                await ctx.reply("The only modes supported right now are: `category_priority`")
+                return
 
-        # icon_to_category = {info["react"]: cat for cat, info in config["judging_categories"].items() if cat != "default"}
-
-        # map choice of (category, medium) to teams
-        room_dist = queue_algorithm(team_category_choice, team_medium_pref)
-
-        # make formatted judging dict
-        judging = {
-            room_id: {
-                "current_team": -1, # signifies that no team is currently in room
-                "teams": room_dist[room_id]
+            # make formatted judging dict
+            judging = {
+                room_id: {
+                    "current_team": -1, # signifies that no team is currently in room
+                    "teams": room_to_teams[room_id]
+                }
+                for room_id in room_to_teams.keys()
             }
-            for room_id in room_dist.keys()
-        }
+
+            # send info message
+            await ctx.reply("This is a json file mapping the *room ID* (as specified in the config.json for this bot) to a list of *team names* (as in the Discord roles), as well as a txt log file for the algorithm. Check the txt log file to make sure everything looks right, modify the json as desired, and then use the json to start judging with the `start_judging` command (be careful with that though).")
+            
+            # send generated queue
+            await self.send_as_json(ctx, judging, filename="judging_breakdown.json")
+            await ctx.send(file=discord.File(queue_log_name, filename="queue_log.txt"))
+
+        except Exception as e:
+            # catching arbitrary exception despite bad practice because log handler still needs to be added back
+            # if something goes wrong
+            logging.error(f"something went wrong in auto_queue! {e}")
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"Something went wrong. Error message:\n```\n{e}```")
+
         
         # remove special queue logger
         logging.info("auto_make_queues: Finished auto-generating queue.")
@@ -276,13 +220,6 @@ class Judging(commands.Cog):
         root_logger.removeHandler(queue_log_handler)
         root_logger.addHandler(main_log_handler)
 
-        # send info message
-        await ctx.reply("This is a json file mapping the *room ID* (as specified in the config.json for this bot) to a list of *team names* (as in the Discord roles), as well as a txt log file for the algorithm. Check the txt log file to make sure everything looks right, modify the json as desired, and then use the json to start judging with the `start_judging` command (be careful with that though).")
-
-        # send generated queue
-        await self.send_as_json(ctx, judging, filename="judging_breakdown.json")
-
-        await ctx.send(file=discord.File(queue_log_name, filename="queue_log.txt"))
 
 
     @commands.command(help=f'''Starts the judging process using the contents of the json file attached. This will completely discard any judging process that is currently being run, and the bot will start off with the configuration described in the json. Restricted.
@@ -310,7 +247,7 @@ class Judging(commands.Cog):
 
         # download the attachment
         # im not a security expert but i can see this being a bit of a hazard. please do not hack my bot
-        filename = self.gen_filename("received", "json")
+        filename = utils.gen_filename("received", "json")
         
         with open(filename, "wb") as f:
             await ctx.message.attachments[0].save(fp=f)
@@ -641,35 +578,76 @@ class Judging(commands.Cog):
 
 
     @commands.command(help=f'''Moves all participants in the waiting VC to the judging VC, for waiting/judging rooms associated with the text channel this command was run in. Restricted.
-    Usage: {config['prefix']}vcpull
-    (Must be run in a text channel associated with a judging room.)''')
-    async def vcpull(self, ctx):
+    
+    Usage: {config['prefix']}vcpull <room_id>
+    Usage: {config['prefix']}vcpull <room_id> <team_name>
 
+    * room_id : The room whose associated judging VC you want to pull the team into.
+    * team_name (optional) : The name of the team. If not specified, you will pull the 'next up' team.
+
+    (Must be run in a text channel associated with a judging room.)''')
+    async def vcpull(self, ctx, room_id: str, team_name: Optional[str]):
+
+        # check permissions
         if not utils.check_perms(ctx.message.author, config["perms"]["can_vcpull"]):
             logging.info(f"vcpull: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
-        logging.info(f"vcpull: run")
+        # check room_id matches text channel run in
+        # use config["judging_rooms"] instead of self.judging because maybe we want to use this as a utility in general
+        if room_id not in config["judging_rooms"].keys():
+            logging.info(f"vcpull: room {room_id} not found in judging rooms {list(config['judging_rooms'].keys())}, exiting")
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"No participants were moved; room ID `{room_id}` either does not exist or has no participants being judged in it.")
+            return
+        elif config["judging_rooms"][room_id]["text"] != ctx.channel.id:
+            logging.info(f"vcpull: room {room_id} doesn't match channel `{ctx.channel.name}`, exiting")
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"No participants were moved; room ID `{room_id}` does not match the channel this command was run in. Ensure you run this command in the text channel associated with the judging room `{room_id}`.")
+            return
+        
+        logging.info(f"vcpull: called with room_id {room_id}")
 
-        # check channel
-        cid = ctx.channel.id
-        for room, info in config["judging_rooms"]:
-            if "text" in info.keys() and info["text"] == cid:
-                logging.info(f"vcpull: was run in channel for {room}")
+        # check special cases
+        if team_name == None:
+            if self.judging == {}:
+                await ctx.message.add_reaction("❌") # react to original command
+                await ctx.message.reply("You haven't specified a team, and there is no 'next team' in the judging queue because judging has not been started. Try specifying a team name.")
+                return
+            elif self.judging[room_id]["current_team"] + 1 == len(self.judging[room_id]["teams"]):
+                # this was called when the final team is already being judged, there is no next team to pull
+                await ctx.message.add_reaction("❌") # react to original command
+                await ctx.message.reply("There is no next team to pull into the VC. Make sure you specify the team name if you meant to pull a different team; run `~help vcpull` for more information.")
+                return
+            else:
+                # if a team name was specified, pull from their vc into the judging vc. if not, pull the next-up team (current_team + 1),
+                # because next-up team hasn't started presenting yet so they aren't in the vc yet
+                next_team_idx = self.judging[room_id]["current_team"] + 1
+                team_name = self.judging[room_id]["teams"][next_team_idx]
 
-                # command was run in the text channel for a particular room
-                waiting_vc = dget(ctx.guild.channels, id=info["waiting_vc"])
-                judging_vc = dget(ctx.guild.channels, id=info["waiting_vc"])
+        ret = self.get_team_artefacts(ctx, team_name)
+        if ret == None:
+            logging.error(f"couldn't get artefacts for `{team_name}`")
+            await ctx.message.add_reaction("❌")
+            await ctx.reply(f"There was an issue getting the category or role for this team; you will need to handle them manually.")
+            return
+        
+        team_role, team_cat, team_text, team_vc = ret
+        judging_vc = dget(ctx.guild.channels, id=config["judging_rooms"][room_id]["judging_vc"])
 
-                # move everyone in the waiting_vc into the judging_vc
-                print(waiting_vc.voice_states)
+        members = team_vc.voice_states.keys() # people in the team vc
 
-                for member in waiting_vc.voice_states.values():
-                    await member.move_to(judging_vc)
+        # get confirmation
+        confirm_msg = await ctx.reply(f"There are {len(members)} users in {team_vc.mention} right now who will be moved into {judging_vc.mention}. React to this message with ✅ to confirm, or ❌ to cancel.")
+        confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
+        if confirmed == None: # timed out
+            return
+        elif confirmed == False: # reacted with ❌
+            await confirm_msg.reply("Participants were not moved.")
+            return
 
-                await ctx.message.add_reaction("✅") # react to original command
-                break
+        # move everyone into the judging_vc
+        for member in members:
+            await member.move_to(judging_vc)
 
-        else:
-            await ctx.message.add_reaction("❌") # react to original command
-            await ctx.message.reply("Make sure you are running this command in the text channel associated with a judging room.")
+        await ctx.message.add_reaction("✅") # react to original command

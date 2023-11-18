@@ -1,2 +1,5 @@
 .env
 discord_venv
+*/__pycache__
+*/*.log
+*/generated

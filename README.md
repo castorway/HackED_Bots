@@ -1,7 +1,10 @@
 # HackED_Bots
 bots for the CompE Club's HackED hackathons!
 
-Invite link: https://discord.com/api/oauth2/authorize?client_id=1164329551359393836&permissions=268438608&scope=bot
+Invite link:
+- Live bot: https://discord.com/api/oauth2/authorize?client_id=1164329551359393836&permissions=8&scope=bot
+- Dev bot: https://discord.com/oauth2/authorize?client_id=1175287931632623637&permissions=8&scope=bot
+
 
 ## Team Creation
 

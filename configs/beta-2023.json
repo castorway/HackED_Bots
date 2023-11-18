@@ -2,20 +2,20 @@
     "prefix": "~",
     "controller_id": 366769320275083276,
     
-    "team_create_channel_id": 1165756636711886869,
+    "team_create_channel_id": 1166976722080641075,
     "roles": {
-        "organizer": 1151380509822304276,
-        "judge": 1165730005695864944,
-        "mentor": 1165729967255064707,
-        "volunteer": 1166063575593386056,
-        "sponsor": 1166831562030076016,
-        "participant": 1165730146964217956
+        "organizer": 1166963582513184778,
+        "judge": 1174416768261955725,
+        "mentor": 1172020999202549782,
+        "volunteer": 1174416878077218958,
+        "sponsor": 1174416817599549530,
+        "participant": 1166963601819566110
     },
     "max_team_participants": 5,
     "team_role_colour": "#adadad",
 
-    "private_judging_log_channel_id": 1173821955523231835,
-    "public_judging_log_channel_id": 1173835289328885841,
+    "private_judging_log_channel_id": 1174929065828958208,
+    "public_judging_log_channel_id": 1174928978474184714,
 
     "perms": {
         "can_control_judging": ["organizer"],
@@ -29,7 +29,6 @@
             "react": "⭐",
             "priority": 0,
             "rooms": ["r1"]
-            
         },
         "mecsimcalc": {
             "react": "⚙️",
@@ -43,8 +42,8 @@
             "display_name": "Judging Room", 
             "medium": "hybrid",
             "location": "DICE-??",
-            "text": 1174416035428974673,
-            "judging_vc": 1173389613763670086
+            "text": 1174929837249548288,
+            "judging_vc": 1174929886595526726
         }
     }
 }

@@ -32,7 +32,7 @@ class Teams(commands.Cog):
 
         # check permissions
         if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
-            logging.info(f"next: ignoring nonpermitted call by {ctx.message.author.name}")
+            logging.info(f"turn_team_creation: ignoring nonpermitted call by {ctx.message.author.name}")
             return
 
         if state == "on":

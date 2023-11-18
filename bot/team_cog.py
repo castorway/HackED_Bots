@@ -176,7 +176,7 @@ class Teams(commands.Cog):
         # Privatize category so that only team and some others can view
         await team_cat.set_permissions(ctx.message.guild.default_role, read_messages=False) # @everyone can't view
         await team_cat.set_permissions(team_role, read_messages=True)
-        for role_name in ['organizer', 'mentor', 'volunteer', 'sponsor']:
+        for role_name in ['organizer', 'mentor', 'volunteer', 'sponsor', 'judge']:
             await team_cat.set_permissions(
                 dget(ctx.message.guild.roles, id=config['roles'][role_name]), # get role with ID identified in config
                 read_messages=True

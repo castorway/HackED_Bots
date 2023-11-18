@@ -30,6 +30,11 @@ class Teams(commands.Cog):
     Creates the team `MyTeam` and adds the three pinged teammates.''')
     async def turn_team_creation(self, ctx, state: Optional[str]):
 
+        # check permissions
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
+            logging.info(f"next: ignoring nonpermitted call by {ctx.message.author.name}")
+            return
+
         if state == "on":
             self.team_creation_enabled = True
             await ctx.message.add_reaction("✅")

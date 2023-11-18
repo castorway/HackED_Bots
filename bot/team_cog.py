@@ -206,13 +206,24 @@ class Teams(commands.Cog):
         msg = f"```asciidoc\n"
         msg += f"TEAMS\n"
         msg += f"==========================\n"
+        char_count = len(msg) + 3 # for ``` at end
 
         for role in ctx.guild.roles:
             if role.colour == config['team_role_colour_obj']:
-                msg += f"[{role.name}]\n"
-                msg += "".join([f"* {member.name} <{member.id}>\n" for member in role.members])
+                add_to_msg = f"[{role.name}]\n"
+                add_to_msg += "".join([f"* {member.name} <{member.id}>\n" for member in role.members])
+
+                char_count += len(add_to_msg)
+                if char_count < 1990: # 10 char padding just in case i messed this up
+                    msg += add_to_msg
+                    char_count += len(add_to_msg)
+                else:
+                    msg += "```"
+                    await ctx.send(msg)
+                    # new msg
+                    msg = f"```asciidoc\n"
+                    char_count = len(msg) + 3
 
         msg += "```"
-
         await ctx.send(msg)
     

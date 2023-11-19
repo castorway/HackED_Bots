@@ -103,3 +103,10 @@ def check_perms(user, allowed_roles):
             return True
     else:
         return False
+
+
+def mdprint(team_name):
+    """ 
+    Removes markdown special characters from a string.
+    """
+    return team_name.replace('_', '-').replace('*', '-')

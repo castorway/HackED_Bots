@@ -57,13 +57,12 @@ class Judging(commands.Cog):
 
 
     def pprint_judging(self, judging=None, public=False):
-        msg = "```md\n"
-        msg += f"JUDGING\n"
-        msg += f"==========================\n"
+        msg = f"# Judging\n"
+        # using :scales: instead of emoji bc discord converts emoji to scales character
         if public:
-            msg += f"The team highlighted in <green> is the current team being judged (if any). If you are one of the next few teams, we encourage you to report to the front desk (for in-person team members) or your team VC (for online team members) in advance.\n\n"
+            msg += f"The team indicated by :scales: is the current team being judged (if any). If you are one of the next few teams, we encourage you to report to the front desk (for in-person team members) or your team VC (for online team members) in advance.\n\n"
         else:
-            msg += f"The team highlighted in <green> is the *current team* that is being judged (if any). The team after it is the team that will be pinged when `~ping <room_id>` is run.\n\n"
+            msg += f"The team indicated by :scales: is the current team being judged (if any). The team after it is the team that will be pinged when `~ping <room_id>` is run.\n\n"
 
         if judging == None:
             judging = self.judging
@@ -79,24 +78,22 @@ class Judging(commands.Cog):
             
             room_display_name = config["judging_rooms"][room_id]['display_name']
             if public:
-                msg += f"[{room_display_name}][{status}]\n"
+                msg += f"## {room_display_name} `[{status}]`\n"
             else:
-                msg += f"\n[{room_id} \"{room_display_name}\"][{status} (current_team = {info['current_team']})]\n"
+                msg += f"## {room_display_name}\n`[id = {room_id} | {status} | current_team = {info['current_team']}]`\n"
 
             # print each team
             for i in range(len(info["teams"])):
                 team_name = info["teams"][i]
-                extra = "" if public else f" ({info['extra'][i]})"
+                extra = "" if public else f" {info['extra'][i]}"
 
                 if i < info["current_team"]:
-                    msg += f"- {team_name}{extra}\n"
+                    msg += f"- `{team_name}`{extra} :white_check_mark:\n"
                 elif i == info["current_team"]:
-                    msg += f"> {team_name}{extra}\n"
+                    msg += f"- `{team_name}`{extra} :scales:\n"
                 else:
-                    msg += f"* {team_name}{extra}\n"
-        
-        msg += "```"
-        
+                    msg += f"- `{team_name}`{extra}\n"
+                
         return msg
 
     
@@ -128,7 +125,7 @@ class Judging(commands.Cog):
 
         # if something changed, leave
         if self.judging[room_id]["teams"][ self.judging[room_id]["current_team"] ] != team_name:
-            logging.info(f"team_timer: left because team {team_name} no longer being judged")
+            logging.info(f"team_timer: left because team `{team_name}` no longer being judged")
             return
         await room_channel.send(f"{controller.mention}, it's been **2** minutes since `{team_name}` started presenting. Ping the next team again so they are ready once `{team_name}` is done.")
 
@@ -136,16 +133,16 @@ class Judging(commands.Cog):
 
         # if something changed, leave
         if self.judging[room_id]["teams"][ self.judging[room_id]["current_team"] ] != team_name:
-            logging.info(f"team_timer: left because team {team_name} no longer being judged")
+            logging.info(f"team_timer: left because team `{team_name}` no longer being judged")
             return
         await room_channel.send(f"{controller.mention}, it's been **4** minutes since `{team_name}` started presenting.\nIf the next team isn't ready, ping both them and the team after.")
 
         await asyncio.sleep(60 * 1) # after 5m, allotted time is up
 
         if self.judging[room_id]["teams"][ self.judging[room_id]["current_team"] ] != team_name:
-            logging.info(f"team_timer: left because team {team_name} no longer being judged")
+            logging.info(f"team_timer: left because team `{team_name}` no longer being judged")
             return
-        await room_channel.send(f"{controller.mention}, it's been **5** minutes since {team_name} started presenting, which means their time is up.\nWrap up the presentation, and if there's a team ready to go then send them in.")
+        await room_channel.send(f"{controller.mention}, it's been **5** minutes since `{team_name}` started presenting, which means their time is up.\nWrap up the presentation, and if there's a team ready to go then send them in.")
     
 
     async def get_team_reacts(self, message, accepted_icons):

@@ -62,9 +62,9 @@ class Teams(commands.Cog):
         '''
 
         # ignore if command not issued in team-create channel
-        if ctx.message.channel.id != config['team_create_channel_id']:
-            logging.info("Ignoring ~team called outside team-create channel")
-            return
+        # if ctx.message.channel.id != config['team_create_channel_id']:
+        #     logging.info("Ignoring ~team called outside team-create channel")
+        #     return
         
         # check permissions
         if not utils.check_perms(ctx.message.author, config["perms"]["can_create_team"]):
@@ -215,18 +215,22 @@ class Teams(commands.Cog):
 
         for role in ctx.guild.roles:
             if role.colour == config['team_role_colour_obj']:
-                add_to_msg = f"[{role.name}]\n"
-                add_to_msg += "".join([f"* {member.name} <{member.id}>\n" for member in role.members])
+                # write team name and members of team
+                add_to_msg = f"[{utils.mdprint(role.name)}]\n"
+                add_to_msg += "".join([f"* {utils.mdprint(member.name)} <{member.id}>\n" for member in role.members])
 
-                char_count += len(add_to_msg)
+                char_count += len(add_to_msg) # char count including this team
+
                 if char_count < 1990: # 10 char padding just in case i messed this up
                     msg += add_to_msg
-                    char_count += len(add_to_msg)
+
                 else:
+                    # send this msg
                     msg += "```"
                     await ctx.send(msg)
+
                     # new msg
-                    msg = f"```asciidoc\n"
+                    msg = f"```asciidoc\n" + add_to_msg
                     char_count = len(msg) + 3
 
         msg += "```"

@@ -233,7 +233,7 @@ class Judging(commands.Cog):
                 logging.info(pformat(team_category_reacts, indent=4))
 
                 room_to_teams, room_to_extra = queuing.category_priority(team_category_reacts) # some queuing algorithm
-                teams_registered = team_category_reacts.keys()
+                teams_registered = list(team_category_reacts.keys())
 
             else:
                 await ctx.message.add_reaction("❌")
@@ -256,6 +256,17 @@ class Judging(commands.Cog):
             # send generated queue
             await self.send_as_json(ctx, judging, filename="judging_breakdown.json")
             await ctx.send(file=discord.File(queue_log_name, filename="queue_log.txt"))
+
+            # send info on missed teams:
+            teams_not_registered = []
+            for role in ctx.guild.roles:
+                if role.color == config['team_role_colour_obj']:
+                    if role.name not in teams_registered:
+                        teams_not_registered.append(role.name)
+            
+            msg = '\n'.join([f"- `{t}`" for t in teams_not_registered])
+
+            await ctx.send(f"The following teams are in the Discord but did not sign up for judging:\n{msg}")
 
         except Exception as e:
             # catching arbitrary exception despite bad practice because log handler still needs to be added back

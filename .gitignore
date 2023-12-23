@@ -3,3 +3,5 @@ discord_venv
 */__pycache__
 */*.log
 */generated
+google_service_account.json
+gspread_testing.py

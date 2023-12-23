@@ -1,0 +1,58 @@
+{
+    "prefix": "~",
+    "guild_id": 1151378506094215188,
+    "controller_id": 366769320275083276,
+
+    "verification_channel_id": 1165727720118964327,
+    "verification_message_id": 1187977356644716584,
+    "verify_react": "⭐",
+
+    "registration_form_key": "1pRhxYbtNDsG8wdA3gPH2MVCNknFgCRRn5zeNL1xPUQY",
+    
+    "team_create_channel_id": 1165756636711886869,
+    "roles": {
+        "organizer": 1151380509822304276,
+        "judge": 1165730005695864944,
+        "mentor": 1165729967255064707,
+        "volunteer": 1166063575593386056,
+        "sponsor": 1166831562030076016,
+        "participant": 1165730146964217956
+    },
+    "max_team_participants": 5,
+    "team_role_colour": "#adadad",
+
+    "private_judging_log_channel_id": 1173821955523231835,
+    "public_judging_log_channel_id": 1173835289328885841,
+
+    "perms": {
+        "can_control_judging": ["organizer"],
+        "can_vcpull": ["organizer", "volunteer", "judge"],
+        "can_create_team": ["participant", "organizer", "volunteer"],
+        "can_teams_info": ["organizer", "volunteer"],
+        "can_sync": ["organizer"]
+    },
+
+    "judging_categories": {
+        "default": {
+            "react": "⭐",
+            "priority": 0,
+            "rooms": ["r1"]
+            
+        },
+        "mecsimcalc": {
+            "react": "⚙️",
+            "priority": 1,
+            "rooms": ["r1"]
+        }
+    },
+
+    "judging_rooms": {
+        "r1": {
+            "display_name": "Judging Room", 
+            "medium": "hybrid",
+            "location": "DICE-??",
+            "text": 1174416035428974673,
+            "judging_vc": 1173389613763670086
+        }
+    }
+}

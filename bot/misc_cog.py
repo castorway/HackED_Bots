@@ -79,3 +79,17 @@ class Misc(commands.Cog):
             await ctx.send(f"**Something's wrong with the config! This is probably an urgent problem.** Unless it's just an issue with the `validate_config` command, which is totally possible.\n```\n{e}\n```")
 
         await ctx.message.reply(f"Config looks okay. Verify all the channels and roles are correct.")
+
+
+    @commands.command(help=f'''Syncs slash commands for this server. Restricted.
+    
+    Usage: {config['prefix']}sync''')
+    async def sync(self, ctx):
+
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_sync"]):
+            logging.info(f"sync: ignoring nonpermitted call by {ctx.message.author.name}")
+            return
+        
+        await self.bot.tree.sync(guild=ctx.guild)
+        await ctx.message.add_reaction("✅")
+        

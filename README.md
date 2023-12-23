@@ -1,6 +1,10 @@
 # HackED_Bots
 bots for the CompE Club's HackED hackathons!
 
+## General Setup
+
+1. Ensure you have a `.env` file in the toplevel repo (`HackED_Bots/`) which contains a variable `BOT_TOKEN=<your_bot_token>`.
+
 ## Team Creation
 
 Any user is able to use the `team` command to create a team.

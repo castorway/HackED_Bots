@@ -7,6 +7,7 @@ import os
 import asyncio
 from datetime import datetime
 import argparse
+import sys
 
 file_path = Path(os.path.realpath(__file__)).parents[0] # path to this directory
 
@@ -18,14 +19,28 @@ args = parser.parse_args()
 
 output_dir = Path(args.output_dir)
 
+
+def logging_setup():
+    log_name = Path(args.output_dir) / gen_filename("log", "log")
+    file_handler = logging.FileHandler(filename=log_name, encoding='utf-8', mode='w')
+    print_handler = logging.StreamHandler(stream=sys.stdout)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(print_handler)
+
+    root_logger.propagate = False
+
+
 def gen_filename(tag, ext):
-        """
-        Generate a new filename with a timestamp to write data to.
-        """
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = output_dir / "generated" / tag / f"{tag}_{timestamp}.{ext}"
-        os.makedirs(file_name.parent, exist_ok=True) # doing this here because i will Definitely forget otherwise
-        return file_name
+    """
+    Generate a new filename with a timestamp to write data to.
+    """
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    file_name = output_dir / "generated" / tag / f"{tag}_{timestamp}.{ext}"
+    os.makedirs(file_name.parent, exist_ok=True) # doing this here because i will Definitely forget otherwise
+    return file_name
 
 
 def general_setup():
@@ -40,15 +55,6 @@ def general_setup():
     if config['team_role_colour'] == '#000000':
         print("WARNING: Config team role colour should not be #000000! This is used as the default colour for @everyone.")
         exit(0)
-
-    # logging setup
-    log_name = output_dir / gen_filename("log", "log")
-    # log_handler = logging.FileHandler(filename=log_name, encoding='utf-8', mode='w')
-    logging.basicConfig(filename=log_name,
-                        filemode='w',
-                        level=logging.DEBUG)
-    # root_logger = logging.getLogger()
-    # root_logger.addHandler(log_handler)
 
     return args, config
 

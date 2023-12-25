@@ -26,6 +26,7 @@ import sys
 from team_cog import Teams
 from judging_cog import Judging
 from verification_cog import Verification, add_verification_slash
+from embed_cog import Embed
 from misc_cog import Misc
 
 
@@ -52,6 +53,7 @@ async def setup(bot: commands.Bot):
     await bot.add_cog(Teams(bot))
     await bot.add_cog(Judging(bot))
     await bot.add_cog(Verification(bot))
+    await bot.add_cog(Embed(bot))
     await bot.add_cog(Misc(bot))
 
     # await bot.tree.sync(guild=discord.Object(id=config['guild_id'])) # sync slash commands

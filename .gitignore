@@ -5,3 +5,6 @@ discord_venv
 */generated
 google_service_account.json
 gspread_testing.py
+hacked.db
+secrets
+backup/database_backups/*

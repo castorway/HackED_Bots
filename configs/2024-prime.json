@@ -1,17 +1,17 @@
 {
     "prefix": "~",
-    "guild_id": 1151378506094215188,
+    "guild_id": 1179492116334919710,
     "controller_id": 366769320275083276,
-
-    "verification_channel_id": 1165727720118964327,
-    "verification_message_id": 1187977356644716584,
-    "verify_react": "⭐",
 
     "registration_form_key": "1pRhxYbtNDsG8wdA3gPH2MVCNknFgCRRn5zeNL1xPUQY",
 
     "db_path": "/home/castorsh3m/HackED_Bots/hacked.db",
     
-    "team_create_channel_id": 1165756636711886869,
+    "channels": {
+        "verification": 1188659732131610655,
+        "team_create": 1165756636711886869
+    },
+
     "roles": {
         "organizer": 1151380509822304276,
         "judge": 1165730005695864944,

@@ -44,19 +44,6 @@ class Bot(commands.Bot):
 intents = discord.Intents.all() # TODO: use less permisisons
 bot = Bot(command_prefix=config['prefix'], intents=intents)
 
-# verification uses slash commands to minimize ~problems~
-class Verification(app_commands.Group):
-    @app_commands.command()
-    @app_commands.describe(email="The email address you used to sign up.")
-    @app_commands.describe(name="The full name you used to sign up.")
-    async def verifyme(self, interaction: discord.Interaction, email: str, name: str):
-        
-        logging.info(f"verifyme called with args: {interaction}, {email}, {name}")
-        # email, name = ctx.message.content.split(limit=3)[1:]
-
-
-# bot.tree.add_command(Verification(), guild=discord.Object(id=config['guild_id']))
-
 # add slash commands
 add_verification_slash(bot)
 
@@ -64,11 +51,10 @@ add_verification_slash(bot)
 async def setup(bot: commands.Bot):
     await bot.add_cog(Teams(bot))
     await bot.add_cog(Judging(bot))
+    await bot.add_cog(Verification(bot))
     await bot.add_cog(Misc(bot))
 
     # await bot.tree.sync(guild=discord.Object(id=config['guild_id'])) # sync slash commands
-
-
 
 @bot.event
 async def on_ready():

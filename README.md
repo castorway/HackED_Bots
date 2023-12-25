@@ -110,3 +110,7 @@ When run, this command increments the bot's judging queue for the room identifie
         5. Return to [3].
 
     * In general, wherever possible, keep commands and correspondence related to a particular room in the room's associated text channel.
+
+## Quick sqlite3 Reference
+
+Backing up a database: `.backup hacked.bk;`

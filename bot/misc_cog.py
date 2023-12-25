@@ -36,6 +36,8 @@ class Misc(commands.Cog):
         logging.info(f"validate_config: called.")
 
         try:
+            assert ctx.guild.id == config["guild_id"], "guild ID is wrong!"
+
             controller = dget(ctx.guild.members, id=config["controller_id"])
             assert controller != None, "controller_id does not belong to server member"
             await ctx.send(f"- `controller_id` belongs to {controller.mention}")
@@ -44,6 +46,11 @@ class Misc(commands.Cog):
                 r = dget(ctx.guild.roles, id=role_id)
                 assert r != None, f"role id for {role} broken"
                 await ctx.send(f"- role id for `{role}` is {r.mention}")
+
+            for channel, channel_id in config["channels"].items():
+                c = dget(ctx.guild.channels, id=channel_id)
+                assert r != None, f"channel id for {channel} broken"
+                await ctx.send(f"- channel for `{channel}` is {c.mention}")
 
             for channel in ["private_judging_log_channel_id", "public_judging_log_channel_id"]:
                 c = dget(ctx.guild.channels, id=config[channel])

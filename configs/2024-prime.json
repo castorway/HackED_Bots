@@ -3,28 +3,28 @@
     "guild_id": 1179492116334919710,
     "controller_id": 366769320275083276,
 
-    "registration_form_key": "1pRhxYbtNDsG8wdA3gPH2MVCNknFgCRRn5zeNL1xPUQY",
+    "registration_form_key": "1KBweo2FG_MqQobT2b1pn3hiDHkkJRXmnizTqx1Q5nZs",
 
     "db_path": "/home/castorsh3m/HackED_Bots/hacked.db",
     
     "channels": {
-        "verification": 1188659732131610655,
-        "team_create": 1165756636711886869
+        "verification": 1188672763712507954,
+        "team_create": 1187246388623454238
     },
 
     "roles": {
-        "organizer": 1151380509822304276,
-        "judge": 1165730005695864944,
-        "mentor": 1165729967255064707,
-        "volunteer": 1166063575593386056,
-        "sponsor": 1166831562030076016,
-        "participant": 1165730146964217956
+        "organizer": 1179492301748326442,
+        "judge": 1179494803310915694,
+        "mentor": 1179494720620212305,
+        "volunteer": 1179494769693565048,
+        "sponsor": 1179494627494068384,
+        "participant": 1187244138446454784
     },
     "max_team_participants": 5,
     "team_role_colour": "#adadad",
 
-    "private_judging_log_channel_id": 1173821955523231835,
-    "public_judging_log_channel_id": 1173835289328885841,
+    "private_judging_log_channel_id": 1188704336272969838,
+    "public_judging_log_channel_id": 1187253391282417684,
 
     "perms": {
         "can_control_judging": ["organizer"],
@@ -34,27 +34,7 @@
         "can_sync": ["organizer"]
     },
 
-    "judging_categories": {
-        "default": {
-            "react": "⭐",
-            "priority": 0,
-            "rooms": ["r1"]
-            
-        },
-        "mecsimcalc": {
-            "react": "⚙️",
-            "priority": 1,
-            "rooms": ["r1"]
-        }
-    },
+    "judging_categories": {},
 
-    "judging_rooms": {
-        "r1": {
-            "display_name": "Judging Room", 
-            "medium": "hybrid",
-            "location": "DICE-??",
-            "text": 1174416035428974673,
-            "judging_vc": 1173389613763670086
-        }
-    }
+    "judging_rooms": {}
 }

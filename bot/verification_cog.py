@@ -38,8 +38,7 @@ class Verification(commands.Cog):
 @app_commands.describe(last_name="What you put in the 'Last Name' field when you signed up.")
 async def verify(interaction: discord.Interaction, email: str, first_name: str, last_name: str):
     '''
-    Check presence in database and spreadsheet, verify user based on email/name. Notify them and set
-    their roles as appropriate.
+    Verify your registration to gain access to the rest of the server.
     '''
 
     logging.info(f"verify called with args: {email}, {first_name}, {last_name}")

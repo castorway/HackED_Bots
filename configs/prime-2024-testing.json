@@ -8,6 +8,8 @@
     "verify_react": "⭐",
 
     "registration_form_key": "1pRhxYbtNDsG8wdA3gPH2MVCNknFgCRRn5zeNL1xPUQY",
+
+    "db_path": "/home/castorsh3m/HackED_Bots/hacked.db",
     
     "team_create_channel_id": 1165756636711886869,
     "roles": {

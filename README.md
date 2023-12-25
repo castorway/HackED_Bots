@@ -4,6 +4,7 @@ bots for the CompE Club's HackED hackathons!
 ## General Setup
 
 1. Ensure you have a `.env` file in the toplevel repo (`HackED_Bots/`) which contains a variable `BOT_TOKEN=<your_bot_token>`.
+2. Ensure you have a sqlite3 database file referenced by the `"db_path"` key in the config. Open the file and run the code in `schema.sql` to initialize it with the tables for participants and teams.
 
 ## Team Creation
 

@@ -31,7 +31,8 @@
         "can_vcpull": ["organizer", "volunteer", "judge"],
         "can_create_team": ["participant", "organizer", "volunteer"],
         "can_teams_info": ["organizer", "volunteer"],
-        "can_sync": ["organizer"]
+        "can_sync": ["organizer"],
+        "controller": ["organizer"]
     },
 
     "judging_categories": {

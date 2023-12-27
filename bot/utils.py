@@ -22,8 +22,17 @@ output_dir = Path(args.output_dir)
 
 def logging_setup():
     log_name = Path(args.output_dir) / gen_filename("log", "log")
+
+    log_format = logging.Formatter(
+        fmt='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)s] %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
     file_handler = logging.FileHandler(filename=log_name, encoding='utf-8', mode='w')
     print_handler = logging.StreamHandler(stream=sys.stdout)
+
+    file_handler.setFormatter(log_format)
+    print_handler.setFormatter(log_format)
 
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)

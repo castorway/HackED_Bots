@@ -14,7 +14,6 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--file_path", required=True)
-parser.add_argument("-s", "--service_account", required=True)
 args = parser.parse_args()
 
 # https://ragug.medium.com/how-to-upload-files-using-the-google-drive-api-in-python-ebefdfd63eab
@@ -40,7 +39,8 @@ media = googleapiclient.http.MediaFileUpload(args.file_path, resumable=True)
 uploaded_file = drive_service.files().create(
     body=file_metadata,
     media_body=media,
-    fields='id'
+    fields='id',
+    supportsAllDrives=True
 ).execute()
 
 print(f"File uploaded with ID: {uploaded_file['id']}")

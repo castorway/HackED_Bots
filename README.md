@@ -114,3 +114,4 @@ When run, this command increments the bot's judging queue for the room identifie
 ## Quick sqlite3 Reference
 
 Backing up a database: `.backup hacked.bk;`
+Setting to read-only: `PRAGMA query_only = ON;`

@@ -78,10 +78,14 @@ def verify(email, first_name, last_name, discord_id):
     df = reload_values()
     res = df[ (df['Email Address'] == email) & (df['First Name'] == first_name) & (df['Last Name'] == last_name) ]
 
+    if len(res.index) == 0:
+        logging.error(f"Tried to verify participant ({email}, {first_name}, {last_name}, {discord_id}) in sheet, but no results that match.")
+        return False
+
     for i in range(len(res.index)):
         # row index is df index + 1 (for sheet header) + 1 (for one-indexed rows)
         cell = f"AH{res.index[i].astype(int) + 2}"
         sheet.get_worksheet(0).update(cell, str(discord_id))
 
         logging.info(f"Updated cell {cell} to verify participant ({email}, {first_name}, {last_name}, {discord_id})")
-
+        return True

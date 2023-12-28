@@ -32,7 +32,8 @@
         "can_create_team": ["participant", "organizer", "volunteer"],
         "can_teams_info": ["organizer", "volunteer"],
         "can_sync": ["organizer"],
-        "controller": ["organizer"]
+        "controller": ["organizer"],
+        "cannot_verify_self": ["participant", "volunteer", "sponsor", "mentor", "judge", "organizer"]
     },
 
     "judging_categories": {},

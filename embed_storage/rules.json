@@ -1,0 +1,19 @@
+{
+    "description": "## Welcome to HackED 2024!\nThis Discord server will be the official platform for HackED 2024. We're glad to have you here!",
+    "color": 62441,
+    "thumbnail": {
+      "url": "https://hacked.compeclub.com/static/media/HackedCircle.609e5186df6e9e190993.png"
+    }
+}
+
+{
+    "title": "Rules",
+    "description": "1. Follow Discord's Community Guidelines and Terms of Service.\n2. Bullying, harassment, or personal attacks towards other members will not be tolerated.\n3. This is a public server; keep messages (and Discord profile contents) appropriate and respectful.\n4. Don't spam channels with irrelevant messages, and try to only ping groups of people if relevant and important.\n5. Don't post advertisements on this server (unless given permission).\n*Breaking any of these rules may result in being temporarily muted or removed from the server and hackathon (determined on a case-by-case basis)*.",
+    "color": 62441
+}
+
+{
+    "title": "Next Steps...",
+    "description": "To confirm you've read and agree with the rules, head to <#1188672763712507954> and verify your registration; you will then gain access to the rest of the server.",
+    "color": 62441
+}

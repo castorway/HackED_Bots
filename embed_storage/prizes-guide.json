@@ -1,0 +1,197 @@
+// TITLE
+
+// before mecsimcalc announced
+{
+"title": "Prize Guide",
+"description": "We have *a lot* of prizes to give out this year, and this channel is your guide to all of them!
+
+**Things To Know:**
+- Every team will be entered in the general HackED challenge.
+- Every team can choose **one other challenge** to enter; you will also be eligible for this challenge's prize, but no others.
+
+*Judging signups to select your challenge are not open yet; they will open during the event.*",
+"color": 62441
+}
+
+// after mecsimcalc announced
+{
+"title": "Prize Guide",
+"description": "We have *a lot* of prizes to give out this year, and this channel is your guide to all of them!
+
+**Things To Know:**
+- Every team that signs up for judging will be entered in the general HackED prize running.
+- Every team can **additionally** choose **one other challenge** to enter; you will be eligible for both the general HackED prizes and that challenge's prize, but no others.
+  - The one exception is the 🔧MecSimCalc challenge. If you enter this challenge, you can also **optionally** enter one of the 🧪ChemE, ⚙️MecE, or ⚡ECE challenges. See the 🔧MecSimCalc section for more details.
+
+*Judging signups to select your challenge are not open yet; they will open during the event.*",
+"color": 62441
+}
+
+// ========================= prize advent calendar ==========================
+
+// Normal
+{
+"title": ":HackED: `General HackED Prizes` :HackED:",
+"description": "*No restrictions--just have fun and build something awesome! Every team that signs up for judging will be entered in the general HackED running by default **as well as** any other challenges you choose to enter.*
+### `CRITERIA`
+- **EXECUTION:** How well does it work?
+- **COMPLEXITY:** How much skill was required to create it?
+- **POLISH:** Are there significant bugs? Is it presentable?
+- **ORIGINALITY:** Have we seen it before?
+- **UTILITY:** Can it address a need or improve someone's life?
+### `PRIZES`
+```asciidoc
+1st Place :: $?
+2nd Place :: $?
+3rd Place :: $?
+```",
+"color": 62441
+}
+TODO: what is the prize for this
+
+// Hardware
+{
+"title": ":HackED: `Hardware Challenge` :HackED:",
+"description": "*Build a project that incorporates a significant hardware component.*
+### `PRIZES`
+```asciidoc
+1st Place :: An Arduino starter kit and Raspberry Pi Pico for each team member.
+### `SPECIAL NOTES`
+- For hardware projects, your team is allowed to start work on any physical components (e.g. 3D-printed parts, laser-cut parts, anything that needs to be put together or manufactured) before the hacking start time.
+- We encourage any Engineering students to make use of the [Elko Engineering Garage](https://confluence.garage.ualberta.ca/) (if you have received the proper training)!
+```",
+"color": 62441
+}
+TODO: and or or??
+
+// AltaML
+{
+"title": ":ALtaML: `Content Moderation Tool Challenge` :AltaML:",
+"description": "*Develop a content moderation tool for social media platforms that utilizes GPT or builds upon any existing models to detect and flag hate speech, misinformation, and harmful content.
+
+This challenge is brought to you in collaboration with [AltaML](https://altaml.com/) and the [Student Innovation Centre](https://www.ualberta.ca/student-innovation-centre/index.html).*
+### `CRITERIA`
+- `FAIRNESS:` Ensure model fairness across diverse demographics, mitigate biases, and prioritize explainability in content flagging decisions.
+- `SOCIAL IMPACT:` Teams should aim to not only develop innovative applications but also ensure that the AI models are accountable, ethical, and serve the best interests of users and society as a whole.
+- `RESOURCEFULNESS:` Teams are encouraged to utilize existing solutions rather than building/training models from scratch given the time constraint.
+- `ACCESSIBILITY:` Teams are encouraged to design/build the user interface in a way that the tool is easy to use.
+### `REQUIREMENTS`
+- To win a prize for this challenge, you must:
+  1. Be a Canadian citizen, permanent resident, or on refugee status.
+  2. Have opted in using the form that was sent out and *received a response confirming your acceptance*. Only the first 70 submissions will be accepted.
+  3. Be on a team that selects the AltaML Challenge when you sign up for judging.
+  4. Build a project that *attempts to satisfy the problem statement* and present your project during the judging period.
+- Note that prizes for this challenge are awarded to *individual participants*, not teams. If a team selects this challenge but only some of the participants were accepted via the form, **only those participants will receive the prize**.
+### `PRIZES`
+```asciidoc
+*$325* guaranteed for each *participant* (not team) who completes all the requirements above.
+```",
+"color": 62441
+}
+
+// DivE
+{
+"title": ":DivE: `DivE Challenge` :DivE:",
+"description": "*Build a project that contributes to EDI (equity, diversity, and inclusion) in some way. This challenge is brought to you in collaboration with [Diversity in Engineering](https://www.diversityineng.ca/).*
+### `CRITERIA`
+- **UTILITY:** How much potential does it have to make a difference for underrepresented/marginalized groups?
+- **ACCESSIBILITY:** What have you done to improve accessibility of your project for users with different needs? For example: dark mode, changing font size, intuitive navigation...
+- **EXECUTION/POLISH:** How well does it work? Are there significant bugs? Is it presentable?
+- **COMPLEXITY:** How much skill was required to create it?
+- **ORIGINALITY:** Have we seen it before?
+### `PRIZES`
+```asciidoc
+1st Place :: $500
+```
+",
+"color": 62441
+}
+
+// MecSimCalc
+{
+"title": ":MecSimCalc: `MecSimCalc Challenge` :MecSimCalc:",
+"description": "*Develop a hackathon project using the [MecSimCalc](https://mecsimcalc.com/) platform.*
+### `CRITERIA`
+- **MECSIMCALC USAGE:** How much does it use MecSimCalc features (e.g. Maps, Conditional Input, Dynamic Tables)?
+- **POLISH:** Are there significant bugs?
+- **UTILITY:** Does it have potential for monetization? Does it have potential for being a viral app?
+- **ORIGINALITY:** How much thought was put into it? Is it unique, have we seen it before?
+### `PRIZES`
+```asciidoc
+1st Place :: $325
+2nd Place :: $175
+```
+### `SPECIAL NOTES`
+- A team can choose to enter both the MecSimCalc challenge and one of the ECE, ChemE, or CivE challenges.
+```",
+"color": 62441
+}
+
+// Telus
+{
+"title": ":Telus: `TELUS Challenge` :Telus:",
+"description": "*Leverage technology to build a more environmentally and socially sustainable future. At TELUS, we strive to challenge ourselves and those around us to seek innovative ways to drive positive change - from building stronger communities and helping those who need it most to ensuring equal access to technology and driving innovations in healthcare and sustainability. In this challenge, we're looking to leverage technology and innovation to help us build stronger communities.*
+### `CRITERIA`
+- **NOVELTY:** Novelty of the idea proposed (/10)
+- **EFFECTIVENESS:** Effectiveness of the proposal in addressing the problem statement (/10)
+- **IMPLEMENTATION:** Level of technical creativity and/or complexity of implementation (/20)
+- **PRESENTATION:** Presentation and Demo quality (/10)
+- (Total: X/50)
+### `PRIZES`
+```asciidoc
+1st Place :: Beats headphones or an Amazon gift card for each team member
+```",
+"color": 62441
+}
+
+// ECE
+{
+"title": ":ECE: `ECE Challenge` :ECE:",
+"description": "*A challenge prize awarded to the best group from the University of Alberta's Department of Electrical and Computer Engineering (including Electrical Engineering, Computer Engineering, and Engineering Physics).*
+### `REQUIREMENTS`
+- All members of the team must be undergraduate students enrolled in either Electrical Engineering, Computer Engineering, or Engineering Physics at the University of Alberta (including any options thereof, e.g. Software).
+- The team may consist of **at most 40%** Computer Engineering students (including the Software and Nanoscale Systems Design options).
+  - A 5-person team may have at most 2 CompEs.
+  - A 4-person or 3-person team may have at most 1 CompE.
+  - A 2-person or 1-person team cannot have any CompEs.
+### `PRIZES`
+```asciidoc
+1st Place :: $1000
+```
+### `SPECIAL NOTES`
+- A team can choose to enter both the ECE challenge and the MecSimCalc challenge.
+",
+"color": 62441
+}
+
+// CivE
+{
+"title": ":CivE: `CivE Challenge` :CivE:",
+"description": "*A challenge prize awarded to the best group from the University of Alberta's Department of Civil and Environmental Engineering (including Civil Engineering, Mining Engineering, and Petroleum Engineering).*
+### `REQUIREMENTS`
+- All members of the team must be undergraduate students enrolled in either Civil Engineering, Mining Engineering, or Petroleum Engineering at the University of Alberta (including any options thereof, e.g. Environmental).
+### `PRIZES`
+```asciidoc
+1st Place :: $1000
+```
+### `SPECIAL NOTES`
+- A team can choose to enter both the CivE challenge and the MecSimCalc challenge.
+```",
+"color": 62441
+}
+
+// ChemE
+{
+"title": ":ChemE: `ChemE Challenge` :ChemE:",
+"description": "*A challenge prize awarded to the best group from the University of Alberta's Department of Chemical and Materials Engineering (including Chemical Engineering and Materials Engineering).*
+### `REQUIREMENTS`
+- All members of the team must be undergraduate students enrolled in either Chemical Engineering or Materials Engineering at the University of Alberta (including any options thereof, e.g. Computer Process Control).
+### `PRIZES`
+```asciidoc
+1st Place :: $1000
+```
+### `SPECIAL NOTES`
+- A team can choose to enter both the ChemE challenge and the MecSimCalc challenge.
+```",
+"color": 62441
+}

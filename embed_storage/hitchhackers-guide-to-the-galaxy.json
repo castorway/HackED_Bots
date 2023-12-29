@@ -1,0 +1,67 @@
+{
+"title": "Introduction",
+"description": "Hi folks! This is HackED's official **HitchHacker's Guide To The Galaxy**. Contained in this channel is everything you'll need to get the most out of your hackathon experience, as well as the answers to a lot of questions you might have throughout the hackathon; it's a reference for safety information, the event schedule, project guidelines, submission instructions, and more.
+
+Please use the search function or the links provided to navigate the Guide (and, if you have any questions that aren't answered, ask us in <#1187244568538787922>!",
+"color": 62441
+}
+
+{
+"title": "`Health & Safety Information`",
+"description": "- HackED has absolutely zero tolerance for sexual harassment or misconduct. Any form of this behaviour could result in expulsion from the event and a follow-up with the Office of the Dean.
+- HackED has absolutely zero tolerance for violence or threats to other participants.
+### `Transit`
+- For your safety, participants are **strongly discouraged from leaving the event in the middle of the night**.
+- Edmonton public transit routes stop running at some point during the night. If you do plan to take transit home late at night, please **make sure your route is still running**. More information about exact times for individual routes can be found [here](https://www.edmonton.ca/sites/default/files/public-files/assets/transit/ETS-Route-Frequency-Table-Sept-2023.pdf).
+- The University of Alberta's Safewalk program will not be running during the event, as it is a weekend.
+- For a safe ride home, dial #TAXI on your cell phone.
+### `Food & Drink`
+- HackED aims to promote healthy work habits and environments. We ask participants to **prioritize their own mental and physical health** as much as possible, above hackathon participation or projects.
+- Staying well-fed and hydrated are important! Please take time to eat and drink water throughout the event. 
+  - We will provide **snacks** throughout the event and **dinner** on Saturday.
+  - There is a water fountain available at our in-person location on DICE 8F. 
+  - Participants are also encouraged to bring what they need to eat for as long as they plan to stay on-campus.",
+"color": 62441
+}
+
+{
+"title": "`Leaving & Reentering The Building`",
+"description": "- If you leave and reenter the building, **you must sign out and back in at the front desk.**
+- Elevators in this building require a key-pass after hours. If you get stuck downstairs and aren't able to use the elevators, send a message in <#1187246576427618354> and a volunteer will let you in.
+- It is possible to get locked in the stairwell near the water fountain. If that happens, send a message in <#1187246576427618354> and a volunteer will let you in.",
+"color": 62441
+}
+
+{
+"title": "`Housekeeping`",
+"description": "- Keep the area clean!
+- There are washrooms near the front desk.
+- A map of gender-neutral washrooms on campus can be found [here](https://www.ualberta.ca/maps.html?l=53.52805170773808,-113.52846739613842&z=18&campus=north_campus&c=All-Gender%20Washrooms). There are several on the first and second floors of the building.",
+"color": 62441
+}
+
+{
+"title": "`Workshops`",
+"description": "Throughout HackED we will be hosting a variety of awesome workshops where you can learn new skills that might be helpful for your project (and for career development and personal projects outside the hackathon!) The workshops will be run by our sponsor representatives and industry professionals.
+
+You can check out the workshop schedule in the Events of this Discord server, or in <#1190147968712573079>. Announcements and information about each workshop (e.g. where to find it) will be sent out shortly before each workshop!",
+"color": 62441
+}
+
+{
+"title": "`Team Creation Details`",
+"description": "More information on team creation will come closer to the event.",
+"color": 62441
+}
+
+{
+"title": "`Project Submission Details`",
+"description": "More information on project submission will come closer to the event.",
+"color": 62441
+}
+
+{
+"title": "`Judging Details`",
+"description": "More information on judging will come closer to the event.",
+"color": 62441
+}

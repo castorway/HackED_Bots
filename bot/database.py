@@ -7,6 +7,10 @@ args, config = utils.general_setup()
 con = sqlite3.connect(config["db_path"])
 cur = con.cursor()
 
+# set up
+cur.execute("PRAGMA foreign_keys = ON;")
+con.commit()
+
 def insert_participant(email, first_name, last_name, discord_id):
     '''
     Insert participant data into Participants table. Performs no checks.

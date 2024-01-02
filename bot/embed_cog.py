@@ -15,7 +15,7 @@ class Embed(commands.Cog):
 
     @commands.command(help=f'''Send a custom embed. Restricted.
     
-    Usage: {config['prefix']}embed_c "some header" "some content..."''')
+    Usage: {config['prefix']}embed <embed contents>''')
     async def embed(self, ctx, contents: str):
         if not utils.check_perms(ctx.message.author, config["perms"]["controller"]):
             logging.info(f"embed_c: ignoring nonpermitted call by {ctx.message.author.name}")
@@ -29,8 +29,9 @@ class Embed(commands.Cog):
 
 
     @commands.command(help=f'''Edits a message with a custom embed. Restricted.
+    The channel and message ID of the message to be edited must be specified.
     
-    Usage: {config['prefix']}embedit_c "some header" "some content..."''')
+    Usage: {config['prefix']}embedit <#channel> <message id> <embed contents>''')
     async def embedit(self, ctx, channel: discord.TextChannel, message_id: str):
         if not utils.check_perms(ctx.message.author, config["perms"]["controller"]):
             logging.info(f"embedit_c: ignoring nonpermitted call by {ctx.message.author.name}")
@@ -46,9 +47,9 @@ class Embed(commands.Cog):
         await ctx.message.add_reaction("✅")
 
 
-    @commands.command(help=f'''Edits a message with a custom embed. Restricted.
+    @commands.command(help=f'''Sends a custom embed in a particular channel. Restricted.
     
-    Usage: {config['prefix']}embedit_c "some header" "some content..."''')
+    Usage: {config['prefix']}embedin <#channel> <embed contents>''')
     async def embedin(self, ctx, channel: discord.TextChannel):
         if not utils.check_perms(ctx.message.author, config["perms"]["controller"]):
             logging.info(f"embedit_c: ignoring nonpermitted call by {ctx.message.author.name}")
@@ -62,9 +63,12 @@ class Embed(commands.Cog):
         await channel.send(embed=embed)
         await ctx.message.add_reaction("✅")
 
-    @commands.command(help=f'''Edits a message with a custom embed. Restricted.
-    
-    Usage: {config['prefix']}embedit_c "some header" "some content..."''')
+
+    @commands.command(help=f'''Edits a message with a custom embed, with contents read from a file. Restricted.
+    This command is necessary because long/complex embeds will go over the character limit easily.
+                      
+    Usage: {config['prefix']}embedit_f <#channel> <message id>
+    * Message must have a JSON file attached with the embed contents.''')
     async def embedit_f(self, ctx, channel: discord.TextChannel, message_id: str):
         if not utils.check_perms(ctx.message.author, config["perms"]["controller"]):
             logging.info(f"embedit_f: ignoring nonpermitted call by {ctx.message.author.name}")
@@ -86,9 +90,12 @@ class Embed(commands.Cog):
         await embed_message.edit(embed=embed)
         await ctx.message.add_reaction("✅")
 
-    @commands.command(help=f'''Edits a message with a custom embed. Restricted.
-    
-    Usage: {config['prefix']}embedit_c "some header" "some content..."''')
+
+    @commands.command(help=f'''Sends a custom embed in a particular channel, with contents read from a file. Restricted.
+    This command is necessary because long/complex embeds will go over the character limit easily.
+                      
+    Usage: {config['prefix']}embedin_f <#channel>
+    * Message must have a JSON file attached with the embed contents.''')
     async def embedin_f(self, ctx, channel: discord.TextChannel):
         if not utils.check_perms(ctx.message.author, config["perms"]["controller"]):
             logging.info(f"embedin_f: ignoring nonpermitted call by {ctx.message.author.name}")

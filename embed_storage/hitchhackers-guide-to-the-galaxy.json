@@ -3,7 +3,10 @@
 "description": "Hi folks! This is HackED's official **HitchHacker's Guide To The Galaxy**. Contained in this channel is everything you'll need to get the most out of your hackathon experience, as well as the answers to a lot of questions you might have throughout the hackathon; it's a reference for safety information, the event schedule, project guidelines, submission instructions, and more.
 
 Please use the search function or the links provided to navigate the Guide (and, if you have any questions that aren't answered, ask us in <#1187244568538787922>!",
-"color": 62441
+"color": 62441,
+"thumbnail": {
+  "url": "https://hacked.compeclub.com/static/media/HackedCircle.609e5186df6e9e190993.png"
+}
 }
 
 {
@@ -64,4 +67,22 @@ You can check out the workshop schedule in the Events of this Discord server, or
 "title": "`Judging Details`",
 "description": "More information on judging will come closer to the event.",
 "color": 62441
+}
+
+{
+"title": "`Directory`",
+"description": "Welcome to the HitchHacker's Guide To The Galaxy! This is the bottom of the channel; use the following links or Discord's search function to navigate to the information you're looking for.
+
+- [Introduction](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362528929304607)
+- [Health & Safety Information](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362595199291472)
+- [Leaving & Reentering The Building](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362626165846106)
+- [Housekeeping](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362678066171965)
+- [Workshops](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362704528027810)
+- [Team Creation Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362730939568248)
+- [Project Submission Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095)
+- [Judging Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436)",
+"color": 62441,
+"thumbnail": {
+  "url": "https://hacked.compeclub.com/static/media/HackedCircle.609e5186df6e9e190993.png"
+}
 }

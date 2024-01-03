@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.utils import get as dget
 from pathlib import Path
 import json
 import logging
@@ -125,3 +126,18 @@ def mdprint(team_name):
     Removes markdown special characters from a string.
     """
     return team_name.replace('_', '-').replace('*', '-')
+
+
+async def get_controller(guild):
+    controller = await guild.fetch_member(config['controller_id'])
+    return controller
+
+
+async def send_as_json(ctx, dictionary, save_with_tag, send_with_name):
+    # make file
+    save_filename = gen_filename(save_with_tag, "json")
+    with open(save_filename, "w") as f:
+        f.write(json.dumps(dictionary, indent=4))
+
+    # send file
+    await ctx.send(file=discord.File(save_filename, filename=send_with_name))

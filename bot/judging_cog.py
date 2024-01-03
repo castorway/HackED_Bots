@@ -29,13 +29,7 @@ class Judging(commands.Cog):
 
 
     async def send_as_json(self, ctx, dictionary, filename):
-        # make file
-        save_filename = utils.gen_filename("autoqueue", "json")
-        with open(save_filename, "w") as f:
-            f.write(json.dumps(dictionary, indent=4))
-
-        # send file
-        await ctx.send(file=discord.File(save_filename, filename=filename))
+        utils.send_as_json(ctx, dictionary, save_with_tag="autoqueue", send_with_name=filename)
 
 
     def get_team_artefacts(self, ctx, team_name):

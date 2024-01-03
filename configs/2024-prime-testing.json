@@ -5,11 +5,12 @@
 
     "registration_form_key": "1pRhxYbtNDsG8wdA3gPH2MVCNknFgCRRn5zeNL1xPUQY",
 
-    "db_path": "/home/castorsh3m/dev_HackED_Bots/hacked.db",
+    "db_path": "/home/castorsh3m/dev_HackED_Bots/hackeddev.db",
     
     "channels": {
         "verification": 1188659732131610655,
-        "team_create": 1165756636711886869
+        "team_create": 1165756636711886869,
+        "bot": 1191995472953479288
     },
 
     "roles": {
@@ -32,7 +33,8 @@
         "can_create_team": ["participant", "organizer", "volunteer"],
         "can_teams_info": ["organizer", "volunteer"],
         "can_sync": ["organizer"],
-        "controller": ["organizer"]
+        "controller": ["organizer"],
+        "cannot_verify_self": ["participant", "volunteer", "sponsor", "mentor", "judge", "organizer"]
     },
 
     "judging_categories": {

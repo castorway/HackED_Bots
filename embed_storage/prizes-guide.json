@@ -121,19 +121,38 @@ Build a project that contributes to EDI (equity, diversity, and inclusion) in so
 
 // Telus
 {
-"title": ":Telus: `TELUS Challenge` :Telus:",
+"title": "<:TELUS:1191906798375022653> `TELUS Challenge` <:TELUS:1191906798375022653>",
 "description": "*This challenge is brought to you in collaboration with [TELUS](https://www.telus.com/en).*
 ### `PROBLEM STATEMENT`
-Leverage technology to build a more environmentally and socially sustainable future. At TELUS, we strive to challenge ourselves and those around us to seek innovative ways to drive positive change - from building stronger communities and helping those who need it most to ensuring equal access to technology and driving innovations in healthcare and sustainability. In this challenge, we're looking to leverage technology and innovation to help us build stronger communities.
+Leverage technology to build a more environmentally and socially sustainable future.
+
+At TELUS, we strive to challenge ourselves and those around us to seek innovative ways to drive positive change - from building stronger communities and helping those who need it most to ensuring equal access to technology and driving innovations in healthcare and sustainability. In this challenge, we're looking to leverage technology innovation to help us build stronger communities.
+
+Some project topics could include:
+* Improving accessibility to basic human needs
+* Healthcare, agriculture, food, shelter, clothing, safety, education, employment
+    * Support resources for individuals and community groups facing social issues
+* Gender inequality, racial inequality, poverty, mental health
+    * Social engagement and connection
+* Helping students to get back to in-person activities
+* Helping seniors to become more involved in community activities
+    * Helping local businesses recover from the pandemic
+
+We look forward to seeing the creative solutions that you come up with.
+
+For more ideas: https://sdgs.un.org/goals (Refer to goals 1-6, 8-11, 16-17)
 ### `CRITERIA`
-- **NOVELTY:** Novelty of the idea proposed (/10)
-- **EFFECTIVENESS:** Effectiveness of the proposal in addressing the problem statement (/10)
+- **IDEA (NOVELTY):** Novelty of the idea proposed (/10)
+- **IDEA (EFFECTIVENESS):** Effectiveness of the proposal in addressing the problem statement (/10)
 - **IMPLEMENTATION:** Level of technical creativity and/or complexity of implementation (/20)
 - **PRESENTATION:** Presentation and Demo quality (/10)
 - (Total: X/50)
+### `SPECIAL NOTES`
+- By entering the contest, entrants consent to the use of their names, city of residence, photograph, voice and/or image for publicity purposes in all media used by TELUS, without payment or compensation, and for perpetuity (i.e. we may use the materials for future promotional purposes like social media campaigns). Entrants agree to TELUS' use of the entrants' personal information, which may include us contacting you regarding limited time offers, promotional offers and/or surveys. Full details are as described in TELUS' privacy policy located at telus.com/privacy.
+- For more information, see the [detailed rules provided by TELUS](https://drive.google.com/file/d/1T5OW_VkcDFa_1_cPkzQdLCyxQ2BX0uQ4/view?usp=sharing).
 ### `PRIZES`
 ```asciidoc
-1st Place :: Beats headphones or $100 Amazon gift card for each team member
+1st Place :: A pair of Beats headphones for each team member
 ```",
 "color": 62441
 }

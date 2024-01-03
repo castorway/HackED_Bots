@@ -60,7 +60,7 @@ class Teams(commands.Cog):
         # check channel is bot channel
         if ctx.message.channel.id != config["channels"]["bot"]:
             logging.info(f"all_teams_info: ignoring call in wrong channel by {ctx.message.author.name}")
-            ctx.message.reply("This command cannot be run here.")
+            await ctx.message.reply("This command cannot be run here.")
             return
         
         logging.info(f"all_teams_info: called")
@@ -121,7 +121,7 @@ class Teams(commands.Cog):
         member = members[0]
 
         # get confirmation
-        confirm_msg = await ctx.message.reply(f"Member {member.mention} will be **added to** team `{team_name}`. React to this message with ✅ to confirm, or ❌ to cancel.")
+        confirm_msg = await ctx.message.reply(f"{member.mention} will be **added to** team `{team_name}`. React to this message with ✅ to confirm, or ❌ to cancel.")
         confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
         if confirmed == None: # timed out
             return
@@ -135,8 +135,11 @@ class Teams(commands.Cog):
         if success:
             # also give team role to participant
             await member.add_roles(database.get_team_role(ctx.message.guild, team_name))
+            emote = "✅"
+        else:
+            emote = "❌"
         
-        await confirm_msg.reply(msg)
+        await confirm_msg.reply(emote + ' ' + msg)
 
 
     @commands.command(help=f'''Remove a participant from a team, modifying its list of members. Restricted.
@@ -163,7 +166,7 @@ class Teams(commands.Cog):
         member = members[0]
 
         # get confirmation
-        confirm_msg = await ctx.message.reply(f"Member {member.mention} will be **removed from** team `{team_name}`. React to this message with ✅ to confirm, or ❌ to cancel.")
+        confirm_msg = await ctx.message.reply(f"{member.mention} will be **removed from** team `{team_name}`. React to this message with ✅ to confirm, or ❌ to cancel.")
         confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
         if confirmed == None: # timed out
             return
@@ -177,8 +180,11 @@ class Teams(commands.Cog):
         if success:
             # also remove team role from participant
             await member.remove_roles(database.get_team_role(ctx.message.guild, team_name))
-        
-        await confirm_msg.reply(msg)
+            emote = "✅"
+        else:
+            emote = "❌"
+
+        await confirm_msg.reply(emote + ' ' + msg)
     
 
     @commands.command(help=f'''Edits a team, modifying its name. Restricted.
@@ -229,6 +235,12 @@ async def team(
     if not team_cog.team_creation_enabled:
         logging.info(f"team: ignoring because team creation is disabled")
         await interaction.response.send_message(f"❌ Your team was not created; team creation is disabled right now.")
+        return
+
+    # check run in correct channel
+    if not interaction.channel.id == config['channels']['team_create']:
+        logging.info(f"team: ignoring because run in wrong channel")
+        await interaction.response.send_message(f"❌ Your team was not created; you cannot run this command here.")
         return
     
     # ===== check team name

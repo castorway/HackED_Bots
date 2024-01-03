@@ -1,0 +1,19 @@
+{
+"title": ":handshake: `team-create`",
+"description": "Use this channel to create your HackED team!
+
+**To create a team, use the </team:1191596869877510275> command.** For example, to create a team named `1337-h4xx0rz` with the members <@366769320275083276> and <@1188682152020279429>, I would run this command:
+
+</team:1191596869877510275> 1337-h4xx0rz <@366769320275083276> <@1188682152020279429>
+
+`Team composition information:`
+- Teams may have anywhere from 1 to 5 members, inclusive.
+- Teams may consist of any combination of in-person/virtual participants.
+
+`Command information:`
+- The `team_name` parameter should be your team name, which may only consist of **lowercase letters** and **digits** separated by **dashes**. Some examples of valid team names: `a-hacked-team`, `team-1`, `hackathon-winners`.
+- The `member*` parameters should be **mentions** of each person on the team.
+
+If you want to add/remove members from your team after it is created, please ping <@366769320275083276>.",
+"color": 62441
+}

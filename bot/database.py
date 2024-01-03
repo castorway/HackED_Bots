@@ -77,6 +77,19 @@ def team_exists(team_name: str):
         return False
 
 
+def participant_exists(discord_id):
+    # verify participant exists
+    cur.execute("SELECT * From Participants WHERE discord_id = ?;", (str(discord_id),))
+    matches = cur.fetchall()
+    if len(matches) == 0:
+        return False
+    elif len(matches) == 1:
+        return True
+    else: # more than 1 match
+        logging.error(f"More than one participant in database matches discord_id={discord_id}")
+        return True
+
+
 def check_team_validity(
     team_name: str, 
     team_text: discord.TextChannel,
@@ -165,13 +178,8 @@ def remove_from_team(team_name, member):
     # check participant exists
     if len(matches) == 0:
         logging.error(f"Database: No participant matches discord_id = {member.id}")
-        res, info = False, "Couldn't find a participant matching that user."
-            
-    # check id refers to only 1 participant
-    elif len(matches) > 1:
-        logging.error(f"Database: Multiple participants in Participants table match discord_id = {member.id}")
-        res, info = False, "Multiple participants match that user's ID."
-    
+        res, info = False, "That user is not a verified participant."
+                
     # check participant is actually on this team
     elif matches[0][0] != team_name:
         logging.info(f"Database: Participant {member.name} with id={member.id} is not on team {team_name}")
@@ -194,7 +202,7 @@ def add_to_team(team_name, member):
     logging.info(f"add_to_team called with args: {team_name}, {member}")
 
     # check there aren't already max participants on the team
-    cur.execute("SELECT * FROM Participants WHERE team_name = ?;", (str(member.id),))
+    cur.execute("SELECT * FROM Participants WHERE team_name = ?;", (team_name,))
     matches = cur.fetchall()
 
     if len(matches) >= config['max_team_participants']:
@@ -212,6 +220,11 @@ def add_to_team(team_name, member):
         res, info = False, "That participant is already on a team."
         return res, info
     
+    # verify participant exists
+    if not participant_exists(member.id):
+        res, info = False, "That user is not a verified participant."
+        return res, info
+
     # can add to team
     cur.execute("UPDATE Participants SET team_name = ? WHERE discord_id = ?;", (team_name, str(member.id),))
     con.commit()

@@ -15,13 +15,13 @@
 
 // after mecsimcalc announced
 {
-"title": "Prize Guide",
+"title": ":first_place: `Prize Guide`",
 "description": "We have *a lot* of prizes to give out this year, and this channel is your guide to all of them!
 
 **Things To Know:**
 - Every team that signs up for judging will be entered in the general HackED prize running.
 - Every team can **additionally** choose **one other challenge** to enter; you will be eligible for both the general HackED prizes and that challenge's prize, but no others.
-  - The one exception is the 🔧MecSimCalc challenge. If you enter this challenge, you can also **optionally** enter one of the 🧪ChemE, ⚙️MecE, or ⚡ECE challenges. See the 🔧MecSimCalc section for more details.
+  - The one exception is the MecSimCalc challenges. A team may enter both **one of the two MecSimCalc challenges** and **one of the three Engineering Department challenges**.
 
 *Judging signups to select your challenge are not open yet; they will open during the event.*",
 "color": 62441
@@ -160,7 +160,9 @@ For more ideas: https://sdgs.un.org/goals (Refer to goals 1-6, 8-11, 16-17)
 // MecSimCalc
 {
 "title": ":MecSimCalc: `MecSimCalc General Challenge` :MecSimCalc:",
-"description": "*Develop a hackathon project using the [MecSimCalc](https://mecsimcalc.com/) platform.*
+"description": "*This challenge is brought to you in collaboration with [MecSimCalc](https://mecsimcalc.com/).*
+### `PROBLEM STATEMENT`
+Develop a hackathon project using the [MecSimCalc](https://mecsimcalc.com/) platform.
 ### `CRITERIA`
 - **MONETIZABILITY:** Can it be monetized?
 - **POPULARITY:** Can it attract users to MecSimCalc?
@@ -174,7 +176,7 @@ For more ideas: https://sdgs.un.org/goals (Refer to goals 1-6, 8-11, 16-17)
 ### `REQUIREMENTS`
 - Projects entered in this challenge must make use of [MecSimCalc](https://mecsimcalc.com/).
 ### `SPECIAL NOTES`
-- Check out the [MecSimCalc Documentation](https://docs.mecsimcalc.com/) and [Tutorial Videos](https://www.youtube.com/watch?v=w1mbYhB0skc&list=PLQGb68UbD3eTun_MyUhLh-7xZeMvuJ87A) to familiarize yourself with the platform!
+- Check out the [Basic App Tutorial](https://www.youtube.com/watch?v=w1mbYhB0skc), the [MecSimCalc Documentation](https://docs.mecsimcalc.com/), and the [Tutorial Videos](https://www.youtube.com/watch?v=w1mbYhB0skc&list=PLQGb68UbD3eTun_MyUhLh-7xZeMvuJ87A) to familiarize yourself with the platform!
 - MecSimCalc is an exception to the one-challenge-per-team restriction. A team can choose to enter **both the MecSimCalc challenge and one of the ECE, ChemE, or CivE challenges**.
 ### `PRIZES`
 ```asciidoc
@@ -187,7 +189,9 @@ For more ideas: https://sdgs.un.org/goals (Refer to goals 1-6, 8-11, 16-17)
 // MecSimCalc Maps
 {
 "title": ":MecSimCalc: `MecSimCalc Maps Challenge` :MecSimCalc:",
-"description": "*Develop a hackathon project using the [MecSimCalc](https://mecsimcalc.com/) platform, making use of the MecSimCalc Maps features.*
+"description": "*This challenge is brought to you in collaboration with [MecSimCalc](https://mecsimcalc.com/).*
+### `PROBLEM STATEMENT`
+Develop a hackathon project using the [MecSimCalc](https://mecsimcalc.com/) platform, making use of the MecSimCalc Maps features.
 ### `CRITERIA`
 - **MONETIZABILITY:** Can it be monetized?
 - **POPULARITY:** Can it attract users to MecSimCalc?
@@ -201,7 +205,7 @@ For more ideas: https://sdgs.un.org/goals (Refer to goals 1-6, 8-11, 16-17)
 ### `REQUIREMENTS`
 - Projects entered in this challenge must make use of both [MecSimCalc](https://mecsimcalc.com/) and the **MecSimCalc Maps** features.
 ### `SPECIAL NOTES`
-- Check out the [MecSimCalc Documentation](https://docs.mecsimcalc.com/) and [Tutorial Videos](https://www.youtube.com/watch?v=w1mbYhB0skc&list=PLQGb68UbD3eTun_MyUhLh-7xZeMvuJ87A) to familiarize yourself with the platform!
+- Check out the [Basic App Tutorial](https://www.youtube.com/watch?v=w1mbYhB0skc), the [MecSimCalc Documentation](https://docs.mecsimcalc.com/), and the [Tutorial Videos](https://www.youtube.com/watch?v=w1mbYhB0skc&list=PLQGb68UbD3eTun_MyUhLh-7xZeMvuJ87A) to familiarize yourself with the platform!
 - MecSimCalc is an exception to the one-challenge-per-team restriction. A team can choose to enter **both the MecSimCalc challenge and one of the ECE, ChemE, or CivE challenges**.
 ### `PRIZES`
 ```asciidoc

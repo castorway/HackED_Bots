@@ -144,11 +144,8 @@ async def judging_signup(
     msg3 += f"- See the [GitHub & DevPost Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095) for specific requirements.\n\n"
 
     msg4 = "### More Information:\n"
-    msg4 += "If any of the following conditions are met, *your submission will not be considered*:\n"
-    msg4 += "- If your GitHub repository is updated (i.e. more commits are made to the repository) after the Hacking End Time.\n"
-    msg4 += "- If your DevPost submission does not contain your GitHub repository link.\n"
-    msg4 += "- If any team member has not signed and sent us their waiver.\n\n"
-    msg4 += "*Please review this information and ensure you understand it all.* You are free to change any of this up until judging signups close by rerunning `/judging_signup` with updated information. You may also run `/judging_withdraw` to withdraw your team from judging.\n"
+    msg4 += "- Check the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436) for more information on this command.\n"
+    msg4 += "*Please review the above information and ensure you understand it all.* You are free to change any of this up until judging signups close by rerunning `/judging_signup` with updated information. You may also run `/judging_withdraw` to withdraw your team from judging.\n"
 
     # send first message
     await interaction.response.send_message(msg1)

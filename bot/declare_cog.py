@@ -63,6 +63,9 @@ async def judging_signup(
     '''
     Sign up your team for judging, declare your challenge/s, and submit your project links.
     '''
+
+    medium_pref = medium_pref.name # this one can get rid of Choice object thing early, since it is non-optional
+
     logging.info(f"judging_signup called with args: challenge1={challenge1}, challenge2={challenge2}, medium_pref={medium_pref}, github_link={github_link}, devpost_link={devpost_link}")
 
     # check permissions
@@ -91,59 +94,74 @@ async def judging_signup(
     # only unique, non-None challenges
     new_challenges = challenge_order(list(set([c.name for c in [challenge1, challenge2] if c != None])))
     old_challenges = challenge_order(database.get_teams_challenges(team_name))
-    msg = ""
     logging.info(f"judging_signup: old challenges: {old_challenges}, new_challenges: {new_challenges} before adding HackED")
 
     # info about old challenges
+    msg1 = "### Challenges\n"
     if old_challenges:
-        msg += f"Before you ran this command, `{team_name}` was signed up for judging in these runnings:\n"
-        msg += '\n'.join([f"- {challenge_data['challenges'][x]['formatted_name']}" for x in old_challenges])
-        msg += '\n\n'
+        msg1 += f"Before you ran this command, `{team_name}` was signed up for:\n"
+        msg1 += '\n'.join([f"- {challenge_data['challenges'][x]['formatted_name']}" for x in old_challenges])
+        msg1 += '\n'
     else:
-        msg += f"Before you ran this command, `{team_name}` was not signed up for judging.\n\n"
+        msg1 += f"Before you ran this command, `{team_name}` was not signed up for judging.\n\n"
         
     # check any combinations of 2 are ok
-    if len(new_challenges) > 2 and new_challenges not in challenge_data['accepted_combinations']:
+    if len(new_challenges) > 1 and new_challenges not in challenge_data['accepted_combinations']:
         await interaction.response.send_message(f"❌ Your team was not signed up for judging; that combination of challenges is not allowed.")
         return
     
-    # now can add main hacked as a "challenge" by default
-    new_challenges.append(challenge_data['main_challenge'])
+    # now can add main hacked as a "challenge" by default; put at beginning so it is printed first
+    new_challenges.insert(0, challenge_data['main_challenge'])
     
     # can actually sign up for challenges yay
     success = database.modify_team_challenges(team_name, new_challenges)
     if not success:
-        await interaction.response.send_message(f"❌ Your team was not fully signed up for judging; something unknown went wrong. Paging {utils.get_controller(interaction.guild).mention}.")
+        controller = await utils.get_controller(interaction.guild)
+        await interaction.response.send_message(f"❌ Your team was not fully signed up for judging; something unknown went wrong. Paging {controller.mention}.")
         return
     
     # register medium pref, github/devpost links
     success = database.modify_team_judging_info(team_name, medium_pref, github_link, devpost_link)
     if not success:
-        await interaction.response.send_message(f"❌ Your team was not fully signed up for judging; something unknown went wrong. Paging {utils.get_controller(interaction.guild).mention}.")
+        controller = await utils.get_controller(interaction.guild)
+        await interaction.response.send_message(f"❌ Your team was not fully signed up for judging; something unknown went wrong. Paging {controller.mention}.")
         return
 
     # info about new challenges
-    msg += f"Now, `{team_name}` is signed up for judging in these challenges:\n"
-    msg += '\n'.join([f"- {challenge_data['challenges'][x]['formatted_name']}\n  - {challenge_data['challenges'][x]['additional_info']}" for x in new_challenges])
-    msg += '\n\n'
+    msg1 += f"Now, `{team_name}` is signed up for:\n"
+    msg1 += '\n'.join([f"- {challenge_data['challenges'][x]['formatted_name']}\n  - {challenge_data['challenges'][x]['additional_info']}" for x in new_challenges])
+    msg1 += "\nPlease review the rules for any challenges you have signed up for in <#1187246978535530506> and ensure your team meets all challenge requirements."
 
     # info about medium pref, github/devpost links
-    msg += f"Your medium preference is `{medium_pref}`.\n"
-    msg += f"- We will *try* to match you with {medium_pref} judges for the best experience.\n"
-    msg += f"- Both online and in-person judges can judge online and in-person teams; you will be able to present regardless of the judges you are put with, so don't worry about this.\n\n"
+    msg2 = "### Medium Preference:\n"
+    msg2 += f"- Your medium preference is `{medium_pref}`.\n"
+    msg2 += f"- This means we will *try* to match you with {medium_pref} judges for the best experience. Any judges can judge online/in-person teams; you will be able to present regardless of the judges you are put with, so don't worry about this."
 
-    msg += f"Your GitHub link is `{github_link}`, and your DevPost link is `{devpost_link}`.\n"
-    msg += f"- It's okay to submit an empty/template GitHub/DevPost early on, but **make sure your GitHub and DevPost are up-to-date** with your **full project code and information** by the Hacking End Time.\n\n"
+    msg3 = "### GitHub & DevPost:\n"
+    msg3 += f"- Your GitHub link is: `{github_link}`\n"
+    msg3 += f"- Your DevPost link is: `{devpost_link}`\n"
+    msg3 += f"- It's okay to submit an empty/template GitHub/DevPost early on, but **make sure your GitHub and DevPost are up-to-date** with your **full project code and information** by the Hacking End Time.\n"
+    msg3 += f"- See the [GitHub & DevPost Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095) for specific requirements.\n\n"
 
-    msg += "You are free to change any of this up until judging signups close by rerunning the command with updated information."
+    msg4 = "### More Information:\n"
+    msg4 += "If any of the following conditions are met, *your submission will not be considered*:\n"
+    msg4 += "- If your GitHub repository is updated (i.e. more commits are made to the repository) after the Hacking End Time.\n"
+    msg4 += "- If your DevPost submission does not contain your GitHub repository link.\n"
+    msg4 += "- If any team member has not signed and sent us their waiver.\n\n"
+    msg4 += "*Please review this information and ensure you understand it all.* You are free to change any of this up until judging signups close by rerunning `/judging_signup` with updated information. You may also run `/judging_withdraw` to withdraw your team from judging.\n"
 
-    await interaction.response.send_message(msg)
+    # send first message
+    await interaction.response.send_message(msg1)
+    # send remaining messages in channel
+    await interaction.channel.send(msg2)
+    await interaction.channel.send(msg3)
+    await interaction.channel.send(msg4)
 
 
 @app_commands.command()
 async def judging_withdraw(interaction: discord.Interaction):
     '''
-    Withdraw from judging.
+    Withdraw your team from judging.
     '''
     logging.info(f"judging_withdraw called")
 
@@ -181,8 +199,7 @@ async def judging_withdraw(interaction: discord.Interaction):
         await interaction.response.send_message(f"❌ Your team was not fully withdrawn from judging; something unknown went wrong. Paging {utils.get_controller(interaction.message.guild).mention}.")
         return
     
-    await interaction.response.send_message(f"`{team_name}` was withdrawn from judging. This means you are eligible for no prizes and you do not have to present your project for judging.")
-
+    await interaction.response.send_message(f"**`{team_name}` was withdrawn from judging.** This means you are now **not eligible for any prizes** and you do not have to present your project for judging. If you change your mind, you can run the `/judging_signup` command to sign up for judging.")
 
 
 def add_declare_slash(bot):

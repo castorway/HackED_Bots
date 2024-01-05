@@ -2,11 +2,12 @@
     "challenges": {
         "HackED": {
             "formatted_name": "<:HackED:1190070496230916147> `Main HackED Competition` <:HackED:1190070496230916147>",
-            "additional_info": "You must be signed up for the main HackED competition in order to be signed up for any challenges. It is also okay to be signed up for only the main HackED competition and no other challenges."
+            "additional_info": "You must be signed up for this competition in order to be signed up for any challenges. It is also okay to be signed up for only this competition and no special challenges.",
+            "order": 0
         },
         "AltaML": {
             "formatted_name": "<:AltaML:1190365546554851408> `AltaML Challenge` <:AltaML:1190365546554851408>",
-            "additional_info": "As per the [challenge rules](https://discord.com/channels/1179492116334919710/1187246978535530506/1190366384820060334), prizes for this challenge are awarded to *individual participants*, not teams. If a team selects this challenge but only some members were accepted via the individual signup form and meet the 4 requirements given in the rules, only those members will receive the prize. Prizes are awarded to all participants satisfying the requirements, not based on which teams win or rank highest.",
+            "additional_info": "As per the challenge rules, prizes for this challenge are awarded to *individual participants*, not teams. If a team selects this challenge but only some members were accepted via the individual signup form and meet the 4 requirements given in the rules, only those members will receive the prize.",
             "order": 1
         },
         "Hardware": {
@@ -36,7 +37,7 @@
         },
         "Department of Electrical and Computer Engineering": {
             "formatted_name": "<:UAlberta:1191146533396160623> `Department of Electrical and Computer Engineering Challenge` <:UAlberta:1191146533396160623>",
-            "additional_info": "You will be eligible for the main HackED prizes and the Department of Electrical and Computer Engineering Challenge prize, but no others (unless you also signed up for one of the MecSimCalc challenges). Note that to be eligible for this challenge **all members of your team** must be students enrolled in either Electrical Engineering, Computer Engineering, or Engineering Physics at the University of Alberta (including any options thereof, e.g. Software). Your team must consist of **at least 3** members, and **at most 40%** may be Computer Engineering students. Verify your team meets the requirements in the [challenge rules](https://discord.com/channels/1179492116334919710/1187246978535530506/1190366472359383203).",
+            "additional_info": "You will be eligible for the main HackED prizes and the Department of Electrical and Computer Engineering Challenge prize, but no others (unless you also signed up for one of the MecSimCalc challenges). Note that to be eligible for this challenge **all members of your team** must be students enrolled in either Electrical Engineering, Computer Engineering, or Engineering Physics at the University of Alberta (including any options thereof, e.g. Software). Your team must consist of **at least 3** members, and **at most 40%** may be Computer Engineering students.",
             "order": 7
         },
         "Department of Civil and Environmental Engineering": {

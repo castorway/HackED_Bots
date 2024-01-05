@@ -151,8 +151,9 @@ def insert_team(
     '''
 
     # add team to Teams table
-    cur.execute("INSERT INTO Teams VALUES (?, ?, ?, ?, ?);",
-        (team_name, str(team_text.id), str(team_vc.id), str(team_cat.id), str(team_role.id))
+    cur.execute("INSERT INTO Teams VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+        (team_name, str(team_text.id), str(team_vc.id), str(team_cat.id), str(team_role.id), None, None, None)
+        # None/NULL for judging info that isnt yet specified
     )
     con.commit()
     logging.info(f"Database: created team {team_name}")

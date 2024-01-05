@@ -15,8 +15,8 @@ CREATE TABLE Teams(
     category_id CHAR(20),
     role_id     CHAR(20),
     medium_pref CHAR(20),
-    github_link CHAR(100),
-    devpost_link CHAR(100),
+    github_link CHAR(200),
+    devpost_link CHAR(200),
     PRIMARY KEY (team_name)
 );
 

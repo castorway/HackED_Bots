@@ -63,34 +63,44 @@ You can check out the workshop schedule in the Events of this Discord server, or
 
 {
 "title": "`GitHub/DevPost Details`",
-"description": "Your GitHub and DevPost links **must** be submitted as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436) before the judging signup deadline.",
+"description": "Your GitHub and DevPost links **must** be submitted using the </judging_signup:> command **before the hacking end time** as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436).
+
+Requirements:
+1. Push all the code for your project to a **public** GitHub repository.
+  - If you aren't familiar with GitHub, we encourage you to attend our Git workshop or to ask a mentor for help!
+  - I recommend you have your repository set up early on, you *really* don't want to have last-minute Git troubles right before the Hacking End Time.
+2. Make a submission to [our DevPost]() **including your GitHub link** (there will be a field on the DevPost page for your GitHub repository).
+3. Run the </judging_signup:> command to submit your judging medium preference, GitHub, DevPost, and challenge selection as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436).",
 "color": 62441
 }
 
 {
 "title": "`Judging Signup Details`",
-"description": "To sign up for judging, run the </judging_signup:> command in **your team's text channel**. If your team does not run this command, you will not be registered for judging and will not be eligible for *any* prizes.
+"description": "### `The /judging_signup Command`
+To sign up for judging, run the </judging_signup:> command in **your team text channel**. This command must be run **before the Hacking End Time**. If your team does not run this command, you *will not* be signed up for judging and will not be eligible for *any* prizes.
 
-The command allows you to select up to 3 challenges: `challenge1`, `challenge2`, and `challenge3`.
-- At least 1 of the challenges you select must be `Main HackED`, which signs you up for the main HackED competition.
-- In general, teams may select only 1 other challenge; so you will be specifying 2 challenges in the command (`Main HackED` and your challenge of choice).
-- A special case is when you are signing up for both one of the MecSimCalc challenges and one of the Engineering Department challenges, in which case you will be specifying 3 challenges in the command (`Main HackED`, a MecSimCalc challenge, and an Engineering Department challenge).
+**First**, you must declare a medium preference using the `medium_pref` argument.
+- This may be either `online` or `in-person`. We will *try* to put you in a judging room with judges who are also online/in-person for the best experience (but there is no guarantee).
+- Regardless of which judges you are put with, *both online and in-person teams will be able to present*. The medium preference is only a preference; both online and in-person judges are able to judge online and in-person teams.
 
-You also must declare a medium preference using the `medium_preference` argument.
-- This may be either `online` (in which case we will *try to* put your team in a room with judges attending virtually) or `in-person` (in which case we will *try to* put your team in a room with in-person judges).
-- There is *no guarantee* that selecting `online` means you will be put with online judges, or that selecting `in-person` means you will be put with in-person judges; this is dependent on our judges' availability and practical constraints.
-- Regardless of whether you are put with online or in-person judges, *both online and in-person teams will be able to present*. The medium preference is only a preference; both online and in-person judges will be able to judge online and in-person teams.
-
-Finally, you must submit a link to your Github repository and DevPost project using the `github_link` and `devpost_link` arguments.
-- If you are signing up towards the beginning of the event, it is totally acceptable to submit an empty/template Github and DevPost.
-- However, the links you submit must be updated with your actual project code and information before the judging signup deadline. We will use these links as our official record of your project.
+**Second**, you must submit links to your Github repository and DevPost project using the `github_link` and `devpost_link` arguments.
+- You may at first submit an empty/template Github and DevPost.
+- However, the links you submit **must be updated with your actual project code and information before the Hacking End Time**. We will use these links as our official record of your project.
 - See the [Project Submission Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095) for more information on requirements for the Github and DevPost.
 
-For example...
-- To sign up for general HackED judging with no challenges, run: </judging_signup:> `Main HackED`
-- To sign up for the DivE challenge (which also enters a team for the general HackED judging), run: </judging_signup:> `Main HackED` `DivE`
-- To sign up for the MecSimCalc Maps challenge and the Department of Electrical and Computer Engineering challenge, run: </judging_signup:> `Main HackED` `MecSimCalc Maps` `Department of Electrical and Computer Engineering`
-- **To unregister from judging**, run </judging_signup:> with no other arguments.",
+**Third**, you may select your challenge/s using the `challenge1` and `challenge2` arguments.
+- You will implicitly be signed up for the main HackED competition, regardless of whether you specify any challenges.
+- **In general, teams may select only 1 challenge**.
+- A special case is when you are signing up for both one of the MecSimCalc challenges and one of the Engineering Department challenges, in which case you may select 2 challenges.
+### `More Information`
+If any of the following conditions are met, **your submission will not be considered**:
+- If your GitHub repository link does not link to a public GitHub repository with your project code.
+- If your GitHub repository is updated (i.e. more commits are made to the repository) after the hacking end time.
+- If your DevPost link does not link to a proper project page created on [the HackED 2024 DevPost]().
+- If your DevPost submission does not contain your GitHub repository link.
+- If any team member has not signed and sent us their waiver.
+
+**To withdraw from judging**, run </judging_withdraw:> in your team text channel. If you withdraw from judging you will no longer be eligible for any prizes and you will not need to present your project to judges.",
 "color": 62441
 }
 

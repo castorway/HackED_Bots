@@ -6,6 +6,7 @@
     "registration_form_key": "1pRhxYbtNDsG8wdA3gPH2MVCNknFgCRRn5zeNL1xPUQY",
 
     "db_path": "/home/castorsh3m/dev_HackED_Bots/hackeddev.db",
+    "challenge_data_path": "/home/castorsh3m/dev_HackED_Bots/bot/challenge_data.json",
     
     "channels": {
         "verification": 1188659732131610655,

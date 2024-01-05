@@ -1,0 +1,63 @@
+{
+    "challenges": {
+        "HackED": {
+            "formatted_name": "<:HackED:1190070496230916147> `Main HackED Competition` <:HackED:1190070496230916147>",
+            "additional_info": "You must be signed up for the main HackED competition in order to be signed up for any challenges. It is also okay to be signed up for only the main HackED competition and no other challenges."
+        },
+        "AltaML": {
+            "formatted_name": "<:AltaML:1190365546554851408> `AltaML Challenge` <:AltaML:1190365546554851408>",
+            "additional_info": "As per the [challenge rules](https://discord.com/channels/1179492116334919710/1187246978535530506/1190366384820060334), prizes for this challenge are awarded to *individual participants*, not teams. If a team selects this challenge but only some members were accepted via the individual signup form and meet the 4 requirements given in the rules, only those members will receive the prize. Prizes are awarded to all participants satisfying the requirements, not based on which teams win or rank highest.",
+            "order": 1
+        },
+        "Hardware": {
+            "formatted_name": "<:HackED:1190070496230916147> `Hardware Challenge` <:HackED:1190070496230916147>",
+            "additional_info": "You will be eligible for the main HackED prizes and the Hardware Challenge prize, but no others.",
+            "order": 2
+        },
+        "DivE": {
+            "formatted_name": "<:DivE:1191537908914602034> `DivE Challenge` <:DivE:1191537908914602034>",
+            "additional_info": "You will be eligible for the main HackED prizes and the DivE Challenge prize, but no others.",
+            "order": 3
+        },
+        "TELUS": {
+            "formatted_name": "<:TELUS:1191906798375022653> `TELUS Challenge` <:TELUS:1191906798375022653>",
+            "additional_info": "You will be eligible for the main HackED prizes and the TELUS Challenge prize, but no others.",
+            "order": 4
+        },
+        "MecSimCalc General": {
+            "formatted_name": "<:MecSimCalc:1192646766865158275> `MecSimCalc General Challenge` <:MecSimCalc:1192646766865158275>",
+            "additional_info": "You will be eligible for the main HackED prizes and the MecSimCalc General Challenge prize, but no others (unless you also signed up for one of the Engineering department challenges).",
+            "order": 5
+        },
+        "MecSimCalc Maps": {
+            "formatted_name": "<:MecSimCalc:1192646766865158275> `MecSimCalc Maps Challenge` <:MecSimCalc:1192646766865158275>",
+            "additional_info": "You will be eligible for the main HackED prizes and the MecSimCalc Maps Challenge prize, but no others (unless you also signed up for one of the Engineering department challenges).",
+            "order": 6
+        },
+        "Department of Electrical and Computer Engineering": {
+            "formatted_name": "<:UAlberta:1191146533396160623> `Department of Electrical and Computer Engineering Challenge` <:UAlberta:1191146533396160623>",
+            "additional_info": "You will be eligible for the main HackED prizes and the Department of Electrical and Computer Engineering Challenge prize, but no others (unless you also signed up for one of the MecSimCalc challenges). Note that to be eligible for this challenge **all members of your team** must be students enrolled in either Electrical Engineering, Computer Engineering, or Engineering Physics at the University of Alberta (including any options thereof, e.g. Software). Your team must consist of **at least 3** members, and **at most 40%** may be Computer Engineering students. Verify your team meets the requirements in the [challenge rules](https://discord.com/channels/1179492116334919710/1187246978535530506/1190366472359383203).",
+            "order": 7
+        },
+        "Department of Civil and Environmental Engineering": {
+            "formatted_name": "<:UAlberta:1191146533396160623> `Department of Civil and Environmental Engineering Challenge` <:UAlberta:1191146533396160623>",
+            "additional_info": "You will be eligible for the main HackED prizes and the Department of Civil and Environmental Engineering Challenge prize, but no others (unless you also signed up for one of the MecSimCalc challenges). Note that to be eligible for this challenge **all members of your team** must be students enrolled in either Civil Engineering, Mining Engineering, or Petroleum Engineering at the University of Alberta (including any options thereof, e.g. Environmental).",
+            "order": 8
+        },
+        "Department of Chemical and Materials Engineering": {
+            "formatted_name": "<:UAlberta:1191146533396160623> `Department of Chemical and Materials Engineering Challenge` <:UAlberta:1191146533396160623>",
+            "additional_info": "You will be eligible for the main HackED prizes and the Department of Chemical and Materials Engineering Challenge prize, but no others (unless you also signed up for one of the MecSimCalc challenges). Note that to be eligible for this challenge **all members of your team** must be students enrolled in either Chemical Engineering or Materials Engineering at the University of Alberta (including any options thereof, e.g. Computer Process Control).",
+            "order": 9
+        }
+    },
+    "accepted_combinations": [
+        ["MecSimCalc General", "Department of Electrical and Computer Engineering"],
+        ["MecSimCalc General", "Department of Civil and Environmental Engineering"],
+        ["MecSimCalc General", "Department of Chemical and Materials Engineering"],
+        ["MecSimCalc Maps", "Department of Electrical and Computer Engineering"],
+        ["MecSimCalc Maps", "Department of Civil and Environmental Engineering"],
+        ["MecSimCalc Maps", "Department of Chemical and Materials Engineering"]
+    ],
+    "optional_challenges": ["AltaML", "Hardware", "DivE", "TELUS", "MecSimCalc General", "MecSimCalc Maps", "Department of Electrical and Computer Engineering", "Department of Civil and Environmental Engineering", "Department of Chemical and Materials Engineering"],
+    "main_challenge": "HackED"
+}

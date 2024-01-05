@@ -287,3 +287,74 @@ def get_teams_info(guild: discord.Guild):
         info[match[0]] = make_team_info(guild, match)
 
     return info
+
+
+def team_from_text_channel(channel_id):
+    '''
+    Gets the team associated with a text channel ID, if any.
+    '''
+
+    cur.execute("SELECT team_name FROM Teams WHERE channel_id = ?;", (str(channel_id),))
+    matches = cur.fetchall()
+
+    if len(matches) == 0:
+        logging.info(f"No team found matching channel_id {channel_id}")
+        return None
+    elif len(matches) == 1:
+        return matches[0][0]
+    else:
+        logging.error(f"More than 1 team_name matches channel_id {channel_id}")
+
+
+def modify_team_challenges(team_name: str, challenge_names: list):
+    '''
+    Sign up a team for a set of challenges (should include main HackED as a challenge). Returns Boolean for success/failure.
+    '''
+    # check team exists
+    if not team_exists(team_name):
+        return False
+    
+    try:
+        # remove any existing challenge signups for this team
+        cur.execute("DELETE FROM Challenges WHERE team_name = ?;", (team_name,))
+
+        # add new challenge signups
+        for challenge_name in challenge_names:
+            cur.execute("INSERT INTO Challenges VALUES (?, ?);", (challenge_name, team_name))
+        con.commit()
+
+        logging.info(f"database, team {team_name} signed up for challenges {challenge_names}")
+        return True
+    
+    except Exception as e:
+        logging.error(f"something went wrong: {e}")
+        return False
+
+
+def get_teams_challenges(team_name: str):
+    '''
+    Get challenges associated with a particular team.
+    '''    
+    cur.execute("SELECT challenge_name FROM Challenges WHERE team_name = ?;", (team_name,))
+    matches = cur.fetchall()
+    return [m[0] for m in matches]
+
+
+def modify_team_judging_info(team_name: str, medium_pref: str, github_link: str, devpost_link: str):
+    '''
+    Modify necessary judging info for a team. Returns Boolean for success/failure.
+    '''
+    # check team exists
+    if not team_exists(team_name):
+        return False
+
+    try:
+        cur.execute("UPDATE Teams SET medium_pref = ?, github_link = ?, devpost_link = ? WHERE team_name = ?;", (medium_pref, github_link, devpost_link, team_name))
+        con.commit()
+
+        logging.info(f"database, team {team_name} updated judging info: {medium_pref}, {github_link}, {devpost_link}")
+        return True
+    
+    except Exception as e:
+        logging.error(f"something went wrong: {e}")
+        return False

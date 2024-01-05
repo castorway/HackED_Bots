@@ -27,6 +27,7 @@ from team_cog import Teams, add_team_slash
 from judging_cog import Judging
 from verification_cog import Verification, add_verification_slash
 from embed_cog import Embed
+from declare_cog import Declare, add_declare_slash
 from misc_cog import Misc
 
 
@@ -48,11 +49,13 @@ bot = Bot(command_prefix=config['prefix'], intents=intents)
 # add slash commands
 add_verification_slash(bot)
 add_team_slash(bot)
+add_declare_slash(bot)
 
 # add cogs for non-slash commands
 async def setup(bot: commands.Bot):
     await bot.add_cog(Teams(bot))
     await bot.add_cog(Judging(bot))
+    await bot.add_cog(Declare(bot))
     await bot.add_cog(Verification(bot))
     await bot.add_cog(Embed(bot))
     await bot.add_cog(Misc(bot))

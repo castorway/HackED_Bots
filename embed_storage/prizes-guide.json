@@ -159,20 +159,54 @@ For more ideas: https://sdgs.un.org/goals (Refer to goals 1-6, 8-11, 16-17)
 
 // MecSimCalc
 {
-"title": ":MecSimCalc: `MecSimCalc Challenge` :MecSimCalc:",
+"title": ":MecSimCalc: `MecSimCalc General Challenge` :MecSimCalc:",
 "description": "*Develop a hackathon project using the [MecSimCalc](https://mecsimcalc.com/) platform.*
 ### `CRITERIA`
-- **MECSIMCALC USAGE:** How much does it use MecSimCalc features (e.g. Maps, Conditional Input, Dynamic Tables)?
-- **POLISH:** Are there significant bugs?
-- **UTILITY:** Does it have potential for monetization? Does it have potential for being a viral app?
-- **ORIGINALITY:** How much thought was put into it? Is it unique, have we seen it before?
+- **MONETIZABILITY:** Can it be monetized?
+- **POPULARITY:** Can it attract users to MecSimCalc?
+- **MARKETS:** Can it open new markets for MecSimCalc?
+- **EXECUTION:** How well does it work?
+- **COMPLEXITY:** How much skill was required to create it?
+- **POLISH:** Are there significant bugs? Is it presentable?
+- **ORIGINALITY:** Have we seen it before?
+- **UTILITY:** Can it address a need or improve someone's life?
+- Minimum standard: The app should be free of any significant bugs and should be novel, sophisticated, and functional to receive a prize.
+### `REQUIREMENTS`
+- Projects entered in this challenge must make use of [MecSimCalc](https://mecsimcalc.com/).
+### `SPECIAL NOTES`
+- Check out the [MecSimCalc Documentation](https://docs.mecsimcalc.com/) and [Tutorial Videos](https://www.youtube.com/watch?v=w1mbYhB0skc&list=PLQGb68UbD3eTun_MyUhLh-7xZeMvuJ87A) to familiarize yourself with the platform!
+- MecSimCalc is an exception to the one-challenge-per-team restriction. A team can choose to enter **both the MecSimCalc challenge and one of the ECE, ChemE, or CivE challenges**.
 ### `PRIZES`
 ```asciidoc
 1st Place :: $325
 2nd Place :: $175
-```
+```",
+"color": 62441
+}
+
+// MecSimCalc Maps
+{
+"title": ":MecSimCalc: `MecSimCalc Maps Challenge` :MecSimCalc:",
+"description": "*Develop a hackathon project using the [MecSimCalc](https://mecsimcalc.com/) platform, making use of the MecSimCalc Maps features.*
+### `CRITERIA`
+- **MONETIZABILITY:** Can it be monetized?
+- **POPULARITY:** Can it attract users to MecSimCalc?
+- **MARKETS:** Can it open new markets for MecSimCalc?
+- **EXECUTION:** How well does it work?
+- **COMPLEXITY:** How much skill was required to create it?
+- **POLISH:** Are there significant bugs? Is it presentable?
+- **ORIGINALITY:** Have we seen it before?
+- **UTILITY:** Can it address a need or improve someone's life?
+- Minimum standard: The app should be free of any significant bugs and should be novel, sophisticated, and functional to receive a prize.
+### `REQUIREMENTS`
+- Projects entered in this challenge must make use of both [MecSimCalc](https://mecsimcalc.com/) and the **MecSimCalc Maps** features.
 ### `SPECIAL NOTES`
-- A team can choose to enter both the MecSimCalc challenge and one of the ECE, ChemE, or CivE challenges.
+- Check out the [MecSimCalc Documentation](https://docs.mecsimcalc.com/) and [Tutorial Videos](https://www.youtube.com/watch?v=w1mbYhB0skc&list=PLQGb68UbD3eTun_MyUhLh-7xZeMvuJ87A) to familiarize yourself with the platform!
+- MecSimCalc is an exception to the one-challenge-per-team restriction. A team can choose to enter **both the MecSimCalc challenge and one of the ECE, ChemE, or CivE challenges**.
+### `PRIZES`
+```asciidoc
+1st Place :: $325
+2nd Place :: $175
 ```",
 "color": 62441
 }

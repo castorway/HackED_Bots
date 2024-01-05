@@ -53,19 +53,44 @@ You can check out the workshop schedule in the Events of this Discord server, or
 
 {
 "title": "`Team Creation Details`",
-"description": "More information on team creation will come closer to the event.",
+"description": "To create a team, run the </team:1192189267867336745> command in <#1187246388623454238>. See the pinned message in <#1187246388623454238> for more details. 
+
+- Teams may have anywhere from 1 to 5 people (inclusive), and may consist of any combination of in-person and virtual participants.
+- The team you create on Discord is our official record of your team's participants and is what we will use for prize distribution.
+- If you want to add/remove someone to/from your team, please ping <@366769320275083276>.",
 "color": 62441
 }
 
 {
-"title": "`Project Submission Details`",
-"description": "More information on project submission will come closer to the event.",
+"title": "`GitHub/DevPost Details`",
+"description": "Your GitHub and DevPost links **must** be submitted as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436) before the judging signup deadline.",
 "color": 62441
 }
 
 {
-"title": "`Judging Details`",
-"description": "More information on judging will come closer to the event.",
+"title": "`Judging Signup Details`",
+"description": "To sign up for judging, run the </judging_signup:> command in **your team's text channel**. If your team does not run this command, you will not be registered for judging and will not be eligible for *any* prizes.
+
+The command allows you to select up to 3 challenges: `challenge1`, `challenge2`, and `challenge3`.
+- At least 1 of the challenges you select must be `Main HackED`, which signs you up for the main HackED competition.
+- In general, teams may select only 1 other challenge; so you will be specifying 2 challenges in the command (`Main HackED` and your challenge of choice).
+- A special case is when you are signing up for both one of the MecSimCalc challenges and one of the Engineering Department challenges, in which case you will be specifying 3 challenges in the command (`Main HackED`, a MecSimCalc challenge, and an Engineering Department challenge).
+
+You also must declare a medium preference using the `medium_preference` argument.
+- This may be either `online` (in which case we will *try to* put your team in a room with judges attending virtually) or `in-person` (in which case we will *try to* put your team in a room with in-person judges).
+- There is *no guarantee* that selecting `online` means you will be put with online judges, or that selecting `in-person` means you will be put with in-person judges; this is dependent on our judges' availability and practical constraints.
+- Regardless of whether you are put with online or in-person judges, *both online and in-person teams will be able to present*. The medium preference is only a preference; both online and in-person judges will be able to judge online and in-person teams.
+
+Finally, you must submit a link to your Github repository and DevPost project using the `github_link` and `devpost_link` arguments.
+- If you are signing up towards the beginning of the event, it is totally acceptable to submit an empty/template Github and DevPost.
+- However, the links you submit must be updated with your actual project code and information before the judging signup deadline. We will use these links as our official record of your project.
+- See the [Project Submission Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095) for more information on requirements for the Github and DevPost.
+
+For example...
+- To sign up for general HackED judging with no challenges, run: </judging_signup:> `Main HackED`
+- To sign up for the DivE challenge (which also enters a team for the general HackED judging), run: </judging_signup:> `Main HackED` `DivE`
+- To sign up for the MecSimCalc Maps challenge and the Department of Electrical and Computer Engineering challenge, run: </judging_signup:> `Main HackED` `MecSimCalc Maps` `Department of Electrical and Computer Engineering`
+- **To unregister from judging**, run </judging_signup:> with no other arguments.",
 "color": 62441
 }
 

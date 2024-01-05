@@ -22,10 +22,7 @@ class Teams(commands.Cog):
             
 
     @commands.command(help=f'''Enables/disables team creation. Restricted.
-    Usage: {config['prefix']}create_team <team_name> *<teammates>
-    
-    Example: {config['prefix']}create_team MyTeam @teammate1 @teammate2 @teammate3
-    Creates the team `MyTeam` and adds the three pinged teammates.''')
+    Usage: {config['prefix']}turn_team_creation [on|off]''')
     async def turn_team_creation(self, ctx, state: Optional[str]):
 
         # check permissions
@@ -340,7 +337,7 @@ async def team(
     # insert team into database
     valid = database.check_team_validity(team_name, team_text, team_vc, team_cat, team_role, members)
     if not valid:
-        await confirm_msg.reply(f"❌ Your team was not created because of an unknown problem; paging {utils.get_controller().mention}.")
+        await confirm_msg.reply(f"❌ Your team was not created because of an unknown problem; paging {utils.get_controller(interaction.guild).mention}.")
         return
     
     database.insert_team(team_name, team_text, team_vc, team_cat, team_role, members)

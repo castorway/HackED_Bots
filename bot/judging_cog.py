@@ -761,3 +761,4 @@ class Judging(commands.Cog):
             await ctx.send(self.pprint_judging(public=True))
         else:
             await ctx.send(self.pprint_judging())
+

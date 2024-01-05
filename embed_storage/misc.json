@@ -1,10 +1,27 @@
+// VERIFY
+{
+"title": ":mag_right: `verify`",
+"description": "To verify your registration and gain access to the rest of the HackED server, **run the </verify:1188705614944276570> command** in this channel. For example, if you registered under the email address johndoe@gmail.com, the first name John, and the last name Doe, you would run this command:
+
+</verify:1188705614944276570> johndoe@gmail.com John Doe
+
+The fields must exactly match the email, first name, and last name you submitted in the registration form. You should have been emailed a copy of your form responses--if you're having trouble, check your response again to make sure you are using the same first and last name.
+
+Troubleshooting:
+- If something isn't working or you have other questions, send a DM to <@366769320275083276>.
+- **If you are a volunteer, mentor, judge, or sponsor,** you don't need to verify through this system; send a DM to <@219177960723316737> and we will give you the correct roles.",
+"color": 62441
+}
+
+
+// TEAM CREATE
 {
 "title": ":handshake: `team-create`",
 "description": "Use this channel to create your HackED team!
 
-**To create a team, use the </team:1191596869877510275> command.** For example, to create a team named `1337-h4xx0rz` with the members <@366769320275083276> and <@1188682152020279429>, I would run this command:
+**To create a team, use the </team:1192189267867336745> command.** For example, to create a team named `1337-h4xx0rz` with the members <@366769320275083276> and <@1188682152020279429>, I would run this command:
 
-</team:1191596869877510275> 1337-h4xx0rz <@366769320275083276> <@1188682152020279429>
+</team:1192189267867336745> 1337-h4xx0rz <@366769320275083276> <@1188682152020279429>
 
 `Team composition information:`
 - Teams may have anywhere from 1 to 5 members, inclusive.

@@ -3,13 +3,81 @@ import numpy as np
 from utils import general_setup
 from copy import deepcopy
 import logging
+import database
+import utils
+import json
+from declare_cog import challenge_order
 
-args, config = general_setup()
+# setup
+args, config = utils.general_setup()
+
+with open(config['challenge_data_path'], 'r') as f:
+    challenge_data = json.loads(f.read())
 
 
+def first_room_match():
+    '''
+    Puts teams in the first room that matches their challenge/medium.
+    Returns a dictionary mapping room_id to teams, and a dictionary of unassigned teams.
+    '''
+    info = database.get_all_challenge_info()
+    print(info)
+
+    rooms = {room_id: [] for room_id in config['judging_rooms'].keys()} # available rooms
+    unchosen = [] # teams that seemingly did not choose any challenges (including main hacked), i.e. did not sign up for judging
+    unassigned = [] # teams that picked challenges but don't get assigned a room
+
+    # for each team, get their challenge combo
+    for team_data in info:
+        
+        team_name = team_data['team_name']
+        medium_pref = team_data['medium_pref']
+        challenge_choices = team_data['challenges']
+        room_found = False
+        logging.info(f"{team_name}: {medium_pref}, {challenge_choices}")
+
+        if challenge_choices == []:
+            # team did not sign up for judging
+            logging.info("> team has no recorded challenge choices, skipping")
+            unchosen.append(team_data)
+
+        # if a challenge and medium matches, put in that room
+        for chal in challenge_choices:
+            if chal == challenge_data['main_challenge']: continue
+
+            for room_id, room_info in config['judging_rooms'].items():
+                if chal in room_info['challenges'] and medium_pref in room_info['mediums']:
+                    rooms[room_id].append(team_data)
+                    room_found = room_id
+                    break
+
+            if room_found: break
+
+        # if it doesn't match any rooms for optional challenge, put in a default room matching medium
+        if not room_found:
+            for room_id, room_info in config['judging_rooms'].items():
+                if room_info['challenges'] == [] and medium_pref in room_info['mediums']:
+                    rooms[room_id].append(team_data)
+                    room_found = room_id
+                    break
+        
+        # if this hasn't worked, error
+        if not room_found:
+            logging.error(f"> Was unable to find a room for {team_name} with medium_pref={medium_pref} and challenges={team_data['challenges']}")
+            unassigned.append(team_data)
+        else:
+            logging.info(f"> Assigned {team_name} to room {room_id}.")
+    
+    return rooms, unchosen, unassigned
+
+
+
+"""
 def category_priority(team_category_reacts):
     '''
     Teams are ordered based on category priority defined in config, then split evenly across any judging rooms.
+    
+    DEPRECATED, worked with old reaction system but not with new sqlite3 db system.
     '''
 
     logging.info("category priority algorithm")
@@ -72,6 +140,8 @@ def original_queue_algorithm(team_category_choice, team_medium_pref):
 
     team_medium_pref is a dictionary mapping team name to a string "online" or "inperson" corresponding to their preferred
     judging medium.
+
+    DEPRECATED
     '''
 
     room_to_teams = {r: [] for r in config["judging_rooms"].keys()}
@@ -208,3 +278,4 @@ def original_queue_algorithm(team_category_choice, team_medium_pref):
 
     # done
     return room_dist
+"""

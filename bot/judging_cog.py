@@ -15,6 +15,7 @@ import itertools
 import numpy as np
 import queuing
 from copy import deepcopy
+import database
 
 args, config = utils.general_setup()
 
@@ -29,7 +30,7 @@ class Judging(commands.Cog):
 
 
     async def send_as_json(self, ctx, dictionary, filename):
-        utils.send_as_json(ctx, dictionary, save_with_tag="autoqueue", send_with_name=filename)
+        await utils.send_as_json(ctx, dictionary, save_with_tag="autoqueue", send_with_name=filename)
 
 
     def get_team_artefacts(self, ctx, team_name):
@@ -139,63 +140,22 @@ class Judging(commands.Cog):
         await room_channel.send(f"{controller.mention}, it's been **5** minutes since `{team_name}` started presenting, which means their time is up.\nWrap up the presentation, and if there's a team ready to go then send them in.")
     
 
-    async def get_team_reacts(self, message, accepted_icons):
-        ''' Given a message, get the reactions to it in a dictionary separated by team. '''
-        team_choices = {} # map team_name : [emojis reacted by team members]
-
-        for reaction in message.reactions:
-
-            # ignore invalid reacts
-            if reaction.emoji not in accepted_icons:
-                logging.info(f"get_team_reacts: ignored reactions with emoji {reaction.emoji}")
-                continue
-
-            # get all the users that added this reaction
-            user_list = []
-            async for user in reaction.users():
-                if user != self.bot.user and not user.bot:
-                    user_list.append(user)
-
-            logging.info(f"get_team_reacts: looking at reaction={reaction}, user_list={[u.name for u in user_list]}")
-
-            # add info to team choice dict
-            for user in user_list:
-                # find user's team
-                for role in user.roles:
-                    if role.colour == config['team_role_colour_obj']:
-                        # role.name is the team name
-                        if role.name not in team_choices.keys():
-                            team_choices[role.name] = [reaction.emoji]
-                        else:
-                            team_choices[role.name].append(reaction.emoji)
-                        break
-                else:
-                    # member not in team
-                    logging.info(f"get_team_reacts: ignored user {user} reacted with {reaction.emoji}, but has no team")
-
-        return team_choices
-
-
     @commands.command(help=f'''Automatically generate judging queues, based on the judging rooms defined in this bot's config and the reactions to the messages set using the `set_judging_react_messages` command. Restricted.
     
-    Usage: {config['prefix']}auto_make_queues <algorithm> <channel> *[message_ids]
-    * algorithm : category_priority
+    Usage: {config['prefix']}make_template_queues <algorithm>
+    * algorithm : first_room_match
     ''')
-    async def auto_make_queues(self, ctx,
-        algorithm: str, 
-        channel: Optional[discord.TextChannel],
-        *react_msg_ids: str
-    ):
+    async def make_template_queues(self, ctx, algorithm: str):
         '''
         Automatically generate judging queues for judging rooms defined in config.json, based on the 
         reactions to messsages optionally provided.
         '''
 
         if not utils.check_perms(ctx.message.author, config["perms"]["can_control_judging"]):
-            logging.info(f"auto_make_queues: ignoring nonpermitted call by {ctx.message.author.name}")
+            logging.info(f"make_template_queues: ignoring nonpermitted call by {ctx.message.author.name}")
             return
         
-        logging.info(f"auto_make_queues: called with algorithm {algorithm}, channel {channel.name}, react_msg_ids {react_msg_ids}.")
+        logging.info(f"make_template_queues: called with algorithm {algorithm}.")
 
         # add special queue logger just for this <3
         root_logger = logging.getLogger()
@@ -212,70 +172,57 @@ class Judging(commands.Cog):
         try:
 
             # different algorithms use different information
-            if algorithm == "category_priority":
-                # one message id, which should be category reactions
-                if len(react_msg_ids) != 1:
-                    await ctx.message.add_reaction("❌")
-                    await ctx.reply("The `category_priority` mode requires one message ID, which should be the ID participants react to with a category react.")
-                    return
-                
-                category_icons = [info["react"] for cat, info in config["judging_categories"].items()]
-                message = await channel.fetch_message(react_msg_ids[0])
-                team_category_reacts = await self.get_team_reacts(message, accepted_icons=category_icons)
+            if algorithm == "first_room_match":
+                # get all the teams/challenge info from db
+                rooms, unchosen, unassigned = queuing.first_room_match()
 
-                logging.info("auto_make_queues: Reactions pulled from the judging messages, by-team:")
-                logging.info(pformat(team_category_reacts, indent=4))
+                # make formatted judging dict
+                judging = {
+                    room_id: {
+                        "teams": rooms[room_id],
+                        "current": -1
+                    }
+                    for room_id in rooms.keys()
+                }
 
-                room_to_teams, room_to_extra = queuing.category_priority(team_category_reacts) # some queuing algorithm
-                teams_registered = list(team_category_reacts.keys())
+                # info about teams that didnt sign up
+                if unchosen:
+                    st = '\n'.join([f"- `{team_data['team_name']}`: medium: `{team_data['medium_pref']}`, challenges: `{' '.join(team_data['challenges'])}`" for team_data in unchosen])
+                    await ctx.reply("Teams that did not sign up for judging:\n" + st)
+                else:
+                    await ctx.reply("All teams have signed up for judging.")
+
+                # info about teams that didnt get assigned a room
+                if unassigned:
+                    st = '\n'.join([f"- `{team_data['team_name']}`: medium: `{team_data['medium_pref']}`, challenges: `{' '.join(team_data['challenges'])}`" for team_data in unassigned])
+                    await ctx.reply("Teams that signed up for judging but the algorithm did not assign to a room (**these teams must be manually given a room**):\n" + st)
+                else:
+                    await ctx.reply("All teams that signed up for judging were successfully assigned a room.")
+
+                # send info message
+                await ctx.reply("- `algorithm.log` is a log file for the algorithm used to sort teams into rooms.\n- `judging.json` is a template file to be used to start judging.\nCheck the log and previous messages to ensure all teams were assigned correctly (look for error messages), then modify the template file if necessary and use it to start judging with the `start_judging` command (be careful with that though).")
+
+                await ctx.send(file=discord.File(queue_log_name, filename="algorithm.log"))
+                await utils.send_as_json(ctx, judging, save_with_tag="autoqueue", send_with_name="judging.json")
 
             else:
                 await ctx.message.add_reaction("❌")
-                await ctx.reply("The only modes supported right now are: `category_priority`")
+                await ctx.reply("The only algorithms supported right now are: `first_room_match`")
                 return
 
-            # make formatted judging dict
-            judging = {
-                room_id: {
-                    "current_team": -1, # signifies that no team is currently in room
-                    "teams": room_to_teams[room_id],
-                    "extra": room_to_extra[room_id]
-                }
-                for room_id in room_to_teams.keys()
-            }
-
-            # send info message
-            await ctx.reply("This is a json file mapping the *room ID* (as specified in the config.json for this bot) to a list of *team names* (as in the Discord roles), as well as a txt log file for the algorithm. Check the txt log file to make sure everything looks right, modify the json as desired, and then use the json to start judging with the `start_judging` command (be careful with that though).")
-            
-            # send generated queue
-            await self.send_as_json(ctx, judging, filename="judging_breakdown.json")
-            await ctx.send(file=discord.File(queue_log_name, filename="queue_log.txt"))
-
-            # send info on missed teams:
-            teams_not_registered = []
-            for role in ctx.guild.roles:
-                if role.color == config['team_role_colour_obj']:
-                    if role.name not in teams_registered:
-                        teams_not_registered.append(role.name)
-            
-            msg = '\n'.join([f"- `{t}`" for t in teams_not_registered])
-
-            await ctx.send(f"The following teams are in the Discord but did not sign up for judging:\n{msg}")
 
         except Exception as e:
             # catching arbitrary exception despite bad practice because log handler still needs to be added back
             # if something goes wrong
-            logging.error(f"something went wrong in auto_queue! {e}")
+            logging.error(f"something went wrong in the queuing!", exc_info=e)
             await ctx.message.add_reaction("❌")
-            await ctx.reply(f"Something went wrong. Error message:\n```\n{e}```")
-
+            await ctx.reply(f"Something went wrong; check the bot logs.")
         
         # remove special queue logger
         logging.info("auto_make_queues: Finished auto-generating queue.")
         queue_log_handler.close()
         root_logger.removeHandler(queue_log_handler)
         root_logger.addHandler(main_log_handler)
-
 
 
     @commands.command(help=f'''Starts the judging process using the contents of the json file attached. This will completely discard any judging process that is currently being run, and the bot will start off with the configuration described in the json. Restricted.
@@ -299,12 +246,11 @@ class Judging(commands.Cog):
             or not ctx.message.attachments[0].filename.endswith(".json"):
 
             await ctx.message.add_reaction("❌")
-            await ctx.reply("Judging was not started; this command must be called with no arguments and exactly one attachment (a json in the same format output by `auto_make_queues`).")
+            await ctx.reply("Judging was not started; this command must be called with no arguments and exactly one attachment (a json in the same format output by `make_template_queues`).")
 
         # download the attachment
-        # im not a security expert but i can see this being a bit of a hazard. please do not hack my bot
+        # im no security expert but i could see this being a bit of a hazard. please do not hack my bot
         filename = utils.gen_filename("received", "json")
-        
         with open(filename, "wb") as f:
             await ctx.message.attachments[0].save(fp=f)
 
@@ -314,16 +260,16 @@ class Judging(commands.Cog):
                 judging = json.loads(f.read())
 
             # get all teams for validation purposes
-            all_teams = await utils.get_all_team_roles(ctx)
-            team_names = [role.name for role in all_teams]
+            teams_info = await database.get_all_challenge_info()
+            team_names = [team['name'] for team in teams_info]
 
             # some lazy validation. can't really check every possible issue here.
             for room_id in judging.keys():
                 assert room_id in list(config["judging_rooms"].keys()), f"room id {room_id} not in config"
-                assert -1 <= judging[room_id]["current_team"], f"for room id {room_id}, current_team {judging[room_id]['current_team']} is invalid"
+                assert -1 <= judging[room_id]["current"], f"for room id {room_id}, current team {judging[room_id]['current']} is invalid"
 
                 if len(judging[room_id]["teams"]) > 0:
-                    assert judging[room_id]["current_team"] <= len(judging[room_id]["teams"]), f"for room id {room_id}, current_team {judging[room_id]['current_team']} is invalid"
+                    assert judging[room_id]["current"] <= len(judging[room_id]["teams"]), f"for room id {room_id}, current_team {judging[room_id]['current_team']} is invalid"
                 
                 for name in judging[room_id]["teams"]:
                     assert name in team_names, f"team name {name} in room id {room_id} does not exist"
@@ -334,7 +280,7 @@ class Judging(commands.Cog):
             logging.info("start_judging: Unable to read json.")
 
             await ctx.message.add_reaction("❌")
-            await ctx.reply(f"Judging was not started; there's likely something wrong with your json. Make sure it matches the format of the output of `setup_queues`.\nError message: `{e}`")
+            await ctx.reply(f"Judging was not started; there's likely something wrong with your json. Make sure it matches the format of the output of `make_template_queues`.\nError message: `{e}`")
 
         # get confirmation
         msg = "This is the judging scheme that you are about to switch to. Verify it is correct, and then react to this message with ✅ to confirm, or ❌ to cancel.\n\n"

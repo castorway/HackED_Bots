@@ -3,6 +3,7 @@ import utils
 import logging
 import discord
 from discord.utils import get as dget
+from declare_cog import challenge_order
 
 args, config = utils.general_setup()
 
@@ -359,3 +360,28 @@ def modify_team_judging_info(team_name: str, medium_pref: str, github_link: str,
     except Exception as e:
         logging.error(f"something went wrong: {e}")
         return False
+    
+
+def get_all_challenge_info():
+    '''
+    Gets information required for sorting teams into judging queues; that is, medium preference and challenges signed up for.
+    '''
+    info = []
+
+    # get all the teams
+    cur.execute("SELECT team_name, medium_pref FROM Teams;")
+    matches_team = cur.fetchall()
+    
+    for team_name, medium_pref in matches_team:
+        # get the challenges this team signed up for
+        cur.execute("SELECT challenge_name FROM Challenges WHERE team_name = ?;", (team_name,))
+        matches_chal = cur.fetchall()
+
+        # construct info
+        info.append({
+            'team_name': team_name,
+            'medium_pref': medium_pref,
+            'challenges': challenge_order([m[0] for m in matches_chal])
+        })
+
+    return info

@@ -38,8 +38,8 @@
 
 // Normal
 {
-"title": ":HackED: `General HackED Prizes` :HackED:",
-"description": "*No restrictions--just have fun and build something awesome! Every team that signs up for judging will be entered in the general HackED running by default **as well as** any other challenges you choose to enter.*
+"title": ":HackED: `Main HackED Prizes` :HackED:",
+"description": "No restrictions--just have fun and build something awesome! Every team that signs up for judging will be entered in the general HackED running by default **as well as** any other challenges you choose to enter.
 ### `CRITERIA`
 - **EXECUTION:** How well does it work?
 - **COMPLEXITY:** How much skill was required to create it?
@@ -48,13 +48,12 @@
 - **UTILITY:** Can it address a need or improve someone's life?
 ### `PRIZES`
 ```asciidoc
-1st Place :: $?
-2nd Place :: $?
-3rd Place :: $?
+1st Place :: $2000
+2nd Place :: $1500
+3rd Place :: $1000
 ```",
 "color": 62441
 }
-TODO: what is the prize for this
 
 // AltaML
 {

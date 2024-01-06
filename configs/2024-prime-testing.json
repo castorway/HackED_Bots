@@ -6,7 +6,7 @@
     "registration_form_key": "1pRhxYbtNDsG8wdA3gPH2MVCNknFgCRRn5zeNL1xPUQY",
 
     "db_path": "/home/castorsh3m/dev_HackED_Bots/hackeddev.db",
-    "challenge_data_path": "/home/castorsh3m/dev_HackED_Bots/bot/challenge_data.json",
+    "challenge_data_path": "/home/castorsh3m/dev_HackED_Bots/configs/2024-prime-challenge_data.json",
     
     "channels": {
         "verification": 1188659732131610655,
@@ -38,27 +38,46 @@
         "cannot_verify_self": ["participant", "volunteer", "sponsor", "mentor", "judge", "organizer"]
     },
 
-    "judging_categories": {
-        "default": {
-            "react": "⭐",
-            "priority": 0,
-            "rooms": ["r1"]
-            
-        },
-        "mecsimcalc": {
-            "react": "⚙️",
-            "priority": 1,
-            "rooms": ["r1"]
-        }
-    },
-
     "judging_rooms": {
         "r1": {
-            "display_name": "Judging Room", 
-            "medium": "hybrid",
+            "display_name": "Judging Room 1", 
+            "mediums": ["in-person"],
             "location": "DICE-??",
-            "text": 1174416035428974673,
-            "judging_vc": 1173389613763670086
+            "text": 1192935288230658088,
+            "judging_vc": 1192935338591662091,
+            "challenges": []
+        },
+        "r2": {
+            "display_name": "Judging Room 2", 
+            "mediums": ["online"],
+            "location": "DICE-??",
+            "text": 1192935423916396615,
+            "judging_vc": 1192935492690378832,
+            "challenges": []
+        },
+        "dive": {
+            "display_name": "DivE Judging Room", 
+            "mediums": ["in-person", "online"],
+            "location": "DICE-??",
+            "text": 1192935547304419398,
+            "judging_vc": 1192935581194407936,
+            "challenges": ["DivE"]
+        },
+        "telus": {
+            "display_name": "TELUS Judging Room", 
+            "mediums": ["in-person", "online"],
+            "location": "DICE-??",
+            "text": 1192935648835928154,
+            "judging_vc": 1192935698488107008,
+            "challenges": ["TELUS"]
+        },
+        "mec": {
+            "display_name": "MecSimCalc Judging Room", 
+            "mediums": ["in-person", "online"],
+            "location": "DICE-??",
+            "text": 1192935720558526657,
+            "judging_vc": 1192935805883261009,
+            "challenges": ["MecSimCalc General", "MecSimCalc Maps"]
         }
     }
 }

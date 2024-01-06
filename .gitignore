@@ -8,3 +8,4 @@ gspread_testing.py
 hacked.db
 secrets
 backup/database_backups/*
+*.db

@@ -63,28 +63,28 @@ You can check out the workshop schedule in the Events of this Discord server, or
 
 {
 "title": "`GitHub & DevPost Details`",
-"description": "Your GitHub and DevPost links **must** be submitted using the </judging_signup:> command **before the hacking end time** as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436).
+"description": "Your GitHub and DevPost links **must** be submitted using the </judging_signup:1193296708122185862> command **before the hacking end time** as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436).
 
 Requirements:
 1. Push all the code for your project to a **public** GitHub repository.
   - If you aren't familiar with GitHub, we encourage you to attend our Git workshop or to ask a mentor for help!
   - We recommend you have your repository set up early on, you *really* don't want to have last-minute Git troubles right before the Hacking End Time.
 2. Make a submission to [the HackED 2024 DevPost](https://hacked-2024.devpost.com/) **including your GitHub link** (there will be a field on the DevPost page for your GitHub repository). For more information check out the [DevPost walkthrough](https://docs.google.com/document/d/14FajozLPYXjOaBhFN2CGat7VCrmkhy2093cHhvxTOUo/edit?usp=sharing).
-3. Run the </judging_signup:> command to submit your judging medium preference, GitHub, DevPost, and challenge selection as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436).
+3. Run the </judging_signup:1193296708122185862> command to submit your judging medium preference, GitHub, DevPost, and challenge selection as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436).
 
-If any of the following conditions *are met*, **your submission will not be considered**:
-- If your GitHub repository link does not link to a **public** GitHub repository with your project code.
-- If your GitHub repository is updated (i.e. more commits are made to the repository) after the Hacking End Time.
-- If your DevPost link does not link to a proper project page created on our DevPost; not just a DevPost project, but a project submitted **to** [the HackED 2024 DevPost](https://hacked-2024.devpost.com/).
-- If your DevPost submission does not contain your GitHub repository link.
-- If any team member has not signed and sent us their waiver.",
+Ensure you have checked all of these conditions, or else **your submission will not be considered**:
+- Your GitHub repository links to a **public** GitHub repository with your project code.
+- Your GitHub repository **is not** updated (i.e. more commits are made to the repository) after the Hacking End Time.
+- Your DevPost link links to a proper project page created on our DevPost; not just a DevPost project, but a project submitted **to** [the HackED 2024 DevPost](https://hacked-2024.devpost.com/).
+- Your DevPost submission contains your GitHub repository link.
+- All team members have signed and sent us their waivers.",
 "color": 62441
 }
 
 {
 "title": "`Judging Signup Details`",
 "description": "### `The /judging_signup Command`
-To sign up for judging, run the </judging_signup:> command in **your team text channel**. This command must be run **before the Hacking End Time**. If your team does not run this command, you *will not* be signed up for judging and will not be eligible for *any* prizes.
+To sign up for judging, run the </judging_signup:1193296708122185862> command in **your team text channel**. This command must be run **before the Hacking End Time**. If your team does not run this command, you *will not* be signed up for judging and will not be eligible for *any* prizes.
 
 **First**, you must declare a medium preference using the `medium_pref` argument.
 - This may be either `online` or `in-person`. We will *try* to put you in a judging room with judges who are also online/in-person for the best experience (but there is no guarantee).
@@ -100,7 +100,7 @@ To sign up for judging, run the </judging_signup:> command in **your team text c
 - **In general, teams may select only 1 challenge**.
 - A special case is when you are signing up for both one of the MecSimCalc challenges and one of the Engineering Department challenges, in which case you may select 2 challenges.
 ### `More Information`
-**To withdraw from judging**, run </judging_withdraw:> in your team text channel. If you withdraw from judging you will no longer be eligible for any prizes and you will not need to present your project to judges.",
+**To withdraw from judging**, run </judging_withdraw:1193296708122185863> in your team text channel. If you withdraw from judging you will no longer be eligible for any prizes and you will not need to present your project to judges.",
 "color": 62441
 }
 
@@ -114,8 +114,8 @@ To sign up for judging, run the </judging_signup:> command in **your team text c
 - [Housekeeping](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362678066171965)
 - [Workshops](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362704528027810)
 - [Team Creation Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362730939568248)
-- [Project Submission Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095)
-- [Judging Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436)",
+- [GitHub & DevPost Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095)
+- [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436)",
 "color": 62441,
 "thumbnail": {
   "url": "https://hacked.compeclub.com/static/media/HackedCircle.609e5186df6e9e190993.png"

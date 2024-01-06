@@ -155,7 +155,7 @@ async def judging_signup(
 
     msg4 = "## More Information:\n"
     msg4 += "- Check the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436) for more information on this command.\n"
-    msg4 += "*Please review the above information and ensure you understand it all.* You are free to change any of this up until judging signups close by rerunning `/judging_signup` with updated information. You may also run `/judging_withdraw` to withdraw your team from judging.\n"
+    msg4 += "*Please review the above information and ensure you understand it all.* You are free to change any of this by rerunning `/judging_signup` with updated information **until the Hacking End Time**. You may also run `/judging_withdraw` to withdraw your team from judging.\n"
 
     # send first message
     await interaction.response.send_message(msg1)
@@ -206,7 +206,7 @@ async def judging_withdraw(interaction: discord.Interaction):
         await interaction.response.send_message(f"❌ Your team was not fully withdrawn from judging; something unknown went wrong. Paging {utils.get_controller(interaction.message.guild).mention}.")
         return
     
-    await interaction.response.send_message(f"**`{team_name}` was withdrawn from judging.** This means you are now **not eligible for any prizes** and you do not have to present your project for judging. If you change your mind, you can run the `/judging_signup` command to sign up for judging.")
+    await interaction.response.send_message(f"**`{team_name}` was withdrawn from judging.** This means you are now **not eligible for any prizes** and you do not have to present your project for judging. If you change your mind, you can run the `/judging_signup` command to sign up for judging **at any point before the Hacking End Time**.")
 
 
 def add_declare_slash(bot):

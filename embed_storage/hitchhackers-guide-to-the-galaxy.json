@@ -68,14 +68,14 @@ You can check out the workshop schedule in the Events of this Discord server, or
 Requirements:
 1. Push all the code for your project to a **public** GitHub repository.
   - If you aren't familiar with GitHub, we encourage you to attend our Git workshop or to ask a mentor for help!
-  - I recommend you have your repository set up early on, you *really* don't want to have last-minute Git troubles right before the Hacking End Time.
-2. Make a submission to [our DevPost]() **including your GitHub link** (there will be a field on the DevPost page for your GitHub repository).
+  - We recommend you have your repository set up early on, you *really* don't want to have last-minute Git troubles right before the Hacking End Time.
+2. Make a submission to [the HackED 2024 DevPost](https://hacked-2024.devpost.com/) **including your GitHub link** (there will be a field on the DevPost page for your GitHub repository). For more information check out the [DevPost walkthrough](https://docs.google.com/document/d/14FajozLPYXjOaBhFN2CGat7VCrmkhy2093cHhvxTOUo/edit?usp=sharing).
 3. Run the </judging_signup:> command to submit your judging medium preference, GitHub, DevPost, and challenge selection as per the instructions in the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436).
 
-If any of the following conditions are met, **your submission will not be considered**:
-- If your GitHub repository link does not link to a public GitHub repository with your project code.
-- If your GitHub repository is updated (i.e. more commits are made to the repository) after the hacking end time.
-- If your DevPost link does not link to a proper project page created on [the HackED 2024 DevPost]().
+If any of the following conditions *are met*, **your submission will not be considered**:
+- If your GitHub repository link does not link to a **public** GitHub repository with your project code.
+- If your GitHub repository is updated (i.e. more commits are made to the repository) after the Hacking End Time.
+- If your DevPost link does not link to a proper project page created on our DevPost; not just a DevPost project, but a project submitted **to** [the HackED 2024 DevPost](https://hacked-2024.devpost.com/).
 - If your DevPost submission does not contain your GitHub repository link.
 - If any team member has not signed and sent us their waiver.",
 "color": 62441

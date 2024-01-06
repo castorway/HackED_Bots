@@ -7,6 +7,7 @@ import logging
 import utils
 import json
 import database
+import re
 
 # setup
 args, config = utils.general_setup()
@@ -51,12 +52,10 @@ class Declare(commands.Cog):
 @app_commands.command()
 @app_commands.choices(challenge1=[app_commands.Choice(name=c, value=c) for c in challenge_data['optional_challenges']])
 @app_commands.choices(challenge2=[app_commands.Choice(name=c, value=c) for c in challenge_data['optional_challenges']])
-@app_commands.choices(medium_pref=[app_commands.Choice(name="online", value="online"), app_commands.Choice(name="in-person", value="in-person")])
 async def judging_signup(
     interaction: discord.Interaction,
     challenge1: Optional[app_commands.Choice[str]],
     challenge2: Optional[app_commands.Choice[str]],
-    medium_pref: app_commands.Choice[str],
     github_link: str,
     devpost_link: str
 ):
@@ -64,7 +63,7 @@ async def judging_signup(
     Sign up your team for judging, declare your challenge/s, and submit your project links.
     '''
 
-    medium_pref = medium_pref.name # this one can get rid of Choice object thing early, since it is non-optional
+    medium_pref = "" # last-minute getting rid of this
 
     logging.info(f"judging_signup called with args: challenge1={challenge1}, challenge2={challenge2}, medium_pref={medium_pref}, github_link={github_link}, devpost_link={devpost_link}")
 
@@ -89,6 +88,15 @@ async def judging_signup(
         logging.info(f"judging_signup: ignoring because signups are disabled")
         await interaction.response.send_message(f"❌ Your team was not signed up for judging; judging signups are disabled right now.")
         return
+
+    # validate links just a little bit
+    if re.search(".*github.com.*", github_link) == None:
+        await interaction.response.send_message(f"❌ Your team was not signed up for judging; it looks like your GitHub link isn't a proper link to a repository.")
+        return
+        
+    if re.search(".*devpost.com.*", devpost_link) == None:
+        await interaction.response.send_message(f"❌ Your team was not signed up for judging; it looks like your DevPost link isn't a proper link to a DevPost project.")
+        return
     
     # order challenges in standard way
     # only unique, non-None challenges
@@ -97,7 +105,7 @@ async def judging_signup(
     logging.info(f"judging_signup: old challenges: {old_challenges}, new_challenges: {new_challenges} before adding HackED")
 
     # info about old challenges
-    msg1 = "### Challenges\n"
+    msg1 = "## Challenges\n"
     if old_challenges:
         msg1 += f"Before you ran this command, `{team_name}` was signed up for:\n"
         msg1 += '\n'.join([f"- {challenge_data['challenges'][x]['formatted_name']}" for x in old_challenges])
@@ -133,24 +141,26 @@ async def judging_signup(
     msg1 += "\nPlease review the rules for any challenges you have signed up for in <#1187246978535530506> and ensure your team meets all challenge requirements."
 
     # info about medium pref, github/devpost links
-    msg2 = "### Medium Preference:\n"
-    msg2 += f"- Your medium preference is `{medium_pref}`.\n"
-    msg2 += f"- This means we will *try* to match you with {medium_pref} judges for the best experience. Any judges can judge online/in-person teams; you will be able to present regardless of the judges you are put with, so don't worry about this."
+    # msg2 = "### Medium Preference:\n"
+    # msg2 += f"- Your medium preference is `{medium_pref}`.\n"
+    # msg2 += f"- This means we will *try* to match you with {medium_pref} judges for the best experience. Any judges can judge online/in-person teams; you will be able to present regardless of the judges you are put with, so don't worry about this."
 
-    msg3 = "### GitHub & DevPost:\n"
+    msg3 = "## GitHub & DevPost:\n"
     msg3 += f"- Your GitHub link is: `{github_link}`\n"
     msg3 += f"- Your DevPost link is: `{devpost_link}`\n"
     msg3 += f"- It's okay to submit an empty/template GitHub/DevPost early on, but **make sure your GitHub and DevPost are up-to-date** with your **full project code and information** by the Hacking End Time.\n"
+    msg3 += f"- **Make sure your GitHub repository is public.**\n"
+    msg3 += f"- **Make sure your DevPost project was submitted *to [the HackED 2024 DevPost](https://hacked-2024.devpost.com/)*.**\n"
     msg3 += f"- See the [GitHub & DevPost Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095) for specific requirements.\n\n"
 
-    msg4 = "### More Information:\n"
+    msg4 = "## More Information:\n"
     msg4 += "- Check the [Judging Signup Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362788745445436) for more information on this command.\n"
     msg4 += "*Please review the above information and ensure you understand it all.* You are free to change any of this up until judging signups close by rerunning `/judging_signup` with updated information. You may also run `/judging_withdraw` to withdraw your team from judging.\n"
 
     # send first message
     await interaction.response.send_message(msg1)
     # send remaining messages in channel
-    await interaction.channel.send(msg2)
+    # await interaction.channel.send(msg2)
     await interaction.channel.send(msg3)
     await interaction.channel.send(msg4)
 

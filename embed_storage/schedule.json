@@ -1,5 +1,37 @@
 {
-"title": "`Schedule`",
-"description": "Event schedule coming soon!",
+"title": ":alarm_clock: `Schedule`",
+"description": "## <t:1704524400:D>
+
+<t:1704554100:t>
+> :star: `Doors Open`
+<t:1704560400:t>
+> :HackED: `Opening Ceremonies`
+*[To Be Announced]*
+> :star: `Hacking Start Time`
+<t:1704567600:t>
+> :HackED: `Intro to Git Workshop`
+<t:1704571200:t>
+> :Amii: `LLM Workshop`
+<t:1704574800:t>
+> :TELUS: `OpenAI Chatbot Workshop`
+<t:1704578400:t>
+> :HackED: `Intro to Raspberry Pi Pico Workshop`
+<t:1704582000:t>
+> :UAlberta: `Rust on the Pico Workshop`
+<t:1704592800:t>
+> :pizza: `Dinner`
+
+## <t:1704610800:D>
+
+<t:1704618000:t>
+> :HackED: `Late-Night Event`
+<t:1704643200:t>
+> :coffee:  `Breakfast`
+*[To Be Announced]*
+> :star: `Hacking End Time`
+<t:1704654000:t>
+> :star: `Judging Begins`
+*[To Be Announced]*
+> :HackED: `Closing Ceremonies`",
 "color": 62441
 }

@@ -3,7 +3,7 @@
 "title": ":mag_right: `verify`",
 "description": "To verify your registration and gain access to the rest of the HackED server, **run the </verify:1188705614944276570> command** in this channel. For example, if you registered under the email address johndoe@gmail.com, the first name John, and the last name Doe, you would run this command:
 
-</verify:1188705614944276570> johndoe@gmail.com John Doe
+</verify:1188705614944276570> `johndoe@gmail.com` `John` `Doe`
 
 The fields must exactly match the email, first name, and last name you submitted in the registration form. You should have been emailed a copy of your form responses--if you're having trouble, check your response again to make sure you are using the same first and last name.
 

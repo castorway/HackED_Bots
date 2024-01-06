@@ -14,6 +14,6 @@ while true; do
 
     echo "Backed up database at $timestamp."
 
-    sleep 3600   # back up every hour for now
+    sleep 1800   # 1800s = 1/2 hr
 
 done

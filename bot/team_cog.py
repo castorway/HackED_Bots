@@ -184,15 +184,45 @@ class Teams(commands.Cog):
         await confirm_msg.reply(emote + ' ' + msg)
     
 
+"""
     @commands.command(help=f'''Edits a team, modifying its name. Restricted.
-    Usage: {config['prefix']}edit_team_name <old_name> <new_name>
+    Usage: {config['prefix']}change_team_name <old_name> <new_name>
     ''')
-    async def edit_team_name(self, ctx):
+    async def change_team_name(self, ctx):
 
         # check permissions
         if not utils.check_perms(ctx.message.author, config["perms"]["controller"]):
             logging.info(f"turn_team_creation: ignoring nonpermitted call by {ctx.message.author.name}")
             return
+
+        args = ctx.message.content.split()
+        old_name, new_name = args[1], args[2]
+
+        # get confirmation
+        confirm_msg = await ctx.message.reply(f"Team `{old_name}` will be **renamed to** `{new_name}`. React to this message with ✅ to confirm, or ❌ to cancel.")
+        confirmed = await utils.get_confirmation(self.bot, ctx.message.author, confirm_msg)
+        if confirmed == None: # timed out
+            return
+        elif confirmed == False: # reacted with ❌
+            await confirm_msg.reply(f"Team was not modified.")
+            return
+
+        success, message = database.change_team_name(old_name, new_name)
+        if success:
+            # get team artefacts
+            team_info = database.get_team_info(ctx.guild, new_name)
+
+            # also change role and channel names
+            await self.bot.edit_role(server=ctx.guild, role=team_info['team_role'], name=new_name)
+            await team_info['team_text'].edit(name=new_name)
+            await team_info['team_vc'].edit(name=new_name)
+            await team_info['team_cat'].edit(name=new_name)
+            emote = "✅"
+        else:
+            emote = "❌"
+
+        await confirm_msg.reply(emote + ' ' + message)
+"""
             
 
     
@@ -221,24 +251,31 @@ async def team(
     logging.info(f"team called with args: team_name={team_name}, members={[m.name for m in members]}")
 
     # check permissions
-    if not utils.check_perms(interaction.user, config["perms"]["can_create_team"]):
+    override = False
+    if utils.check_perms(interaction.user, config["perms"]["controller"]):
+        override = True
+        logging.info(f"team: called by Controller, overriding restrictions")
+
+    elif not utils.check_perms(interaction.user, config["perms"]["can_create_team"]):
         logging.info(f"team: ignoring nonpermitted call by {interaction.user}")
         return
-    
-    # if team creation disabled, exit
-    interaction.client.cogs # for some reason, i can only access Teams cog once this has been run.
-    team_cog = interaction.client.get_cog("Teams")
 
-    if not team_cog.team_creation_enabled:
-        logging.info(f"team: ignoring because team creation is disabled")
-        await interaction.response.send_message(f"❌ Your team was not created; team creation is disabled right now.")
-        return
+    if not override:
+        
+        # if team creation disabled, exit
+        interaction.client.cogs # for some reason, i can only access Teams cog once this has been run.
+        team_cog = interaction.client.get_cog("Teams")
 
-    # check run in correct channel
-    if not interaction.channel.id == config['channels']['team_create']:
-        logging.info(f"team: ignoring because run in wrong channel")
-        await interaction.response.send_message(f"❌ Your team was not created; you cannot run this command here.")
-        return
+        if not team_cog.team_creation_enabled:
+            logging.info(f"team: ignoring because team creation is disabled")
+            await interaction.response.send_message(f"❌ Your team was not created; team creation is disabled right now.")
+            return
+
+        # check run in correct channel
+        if not interaction.channel.id == config['channels']['team_create']:
+            logging.info(f"team: ignoring because run in wrong channel")
+            await interaction.response.send_message(f"❌ Your team was not created; you cannot run this command here.")
+            return
     
     # ===== check team name
     
@@ -296,13 +333,16 @@ async def team(
         return
     
     # ensure sender is on the team
-    if interaction.user not in members:
+    if interaction.user not in members and not override: # organizer can create team without restriction
         await interaction.response.send_message(f"❌ Your team was not created; you cannot create a team that you yourself are not on. (Ensure that you are one of the 5 users mentioned in one of the 'member' fields.)")
         return
         
     # ===== team can be created
 
-    await interaction.response.send_message(f"The team `{team_name}` will be created, and members {' '.join([m.mention for m in members])} will be added.\n\n{interaction.user.mention}, please react to this message with ✅ to confirm, or ❌ to cancel.")
+    msg = "`[Command is being run in override mode.]`" if override else ""
+    msg += f"The team `{team_name}` will be created, and members {' '.join([m.mention for m in members])} will be added.\n\n{interaction.user.mention}, please react to this message with ✅ to confirm, or ❌ to cancel."
+
+    await interaction.response.send_message(msg)
     confirm_msg = await interaction.original_response()
     confirmed = await utils.get_confirmation(interaction.client, interaction.user, confirm_msg)
 

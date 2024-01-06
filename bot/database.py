@@ -291,6 +291,17 @@ def get_teams_info(guild: discord.Guild):
     return info
 
 
+def get_team_info(guild: discord.Guild, team_name: str):
+    logging.info(f"get_team_info: called")
+    info = {}
+
+    cur.execute("SELECT * FROM Teams WHERE team_name = ?;", (team_name,))
+    matches = cur.fetchone()
+    info[match[0]] = make_team_info(guild, match)
+
+    return info
+
+
 def team_from_text_channel(channel_id):
     '''
     Gets the team associated with a text channel ID, if any.
@@ -385,3 +396,25 @@ def get_all_challenge_info():
         })
 
     return info
+
+
+
+def change_team_name(old_name, new_name):
+    '''
+    not my best work. delete the team and create a new identical one. its fine.
+    '''
+    logging.info(f"change_team_name called with old={old_name}, new={new_name}")
+
+    if not team_exists(old_name):
+        return False, f"Team `{old_name}` not found."
+
+    try:
+        cur.execute("UPDATE Teams SET team_name = ? WHERE team_name = ?;", (new_name, old_name))
+        cur.execute("UPDATE Participants SET team_name = ? WHERE team_name = ?;", (new_name, old_name))
+        cur.execute("UPDATE Challenges SET team_name = ? WHERE team_name = ?;", (new_name, old_name))
+        con.commit()
+
+        logging.info("team name changed!")
+        return True, f"Team `{old_name}` renamed to `{new_name}`."
+    except Exception as e:
+        logging.error("something went wrong changing team name", exc_info=e)

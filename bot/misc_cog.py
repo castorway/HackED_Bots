@@ -23,6 +23,10 @@ class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        logging.info(f"Received: {message.content} | {str(message)}")
+        # await self.bot.process_commands(message)
 
     @commands.command(help=f'''Validates the bot's config for this server. Restricted.
     

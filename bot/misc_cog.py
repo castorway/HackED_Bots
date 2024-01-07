@@ -25,8 +25,9 @@ class Misc(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        logging.info(f"Received: {message.content} | {str(message)}")
-        # await self.bot.process_commands(message)
+        if message.author.id != self.bot.application_id:
+            logging.info(f"Received: {message.content} | {str(message)}")
+            # await self.bot.process_commands(message)
 
     @commands.command(help=f'''Validates the bot's config for this server. Restricted.
     

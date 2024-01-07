@@ -46,17 +46,17 @@ When run, this command increments the bot's judging queue for the room identifie
         * Specifically ensure that the `judge` role cannot view the text channel. This is for messy commands and panicking about judging that the actual judges should not see.
     * Ensure that all in-person judging rooms have a `location` specified, all online judging rooms have a `judging_vc` specified, and all hybrid judging rooms have both.
 
-### Team Creation Phase
+### Team Creation
 
-* Run `~turn_team_creation on` to switch to the team creation phase.
-    * During this phase, participants can create teams using `~create_team`.
+* Run `~turn_team_creation on` to enable team creation.
+* If enabled, participants can create teams using `/team`.
 
 ### Judging Phase
 
-* Run `~turn_team_creation off` to disable the `~create_team` command.
+* Run `~turn_team_creation off` to disable the `/team` command.
+
 * To automatically generate judging queues:
-    * Run `~set_judging_react_messages` to tell the bot where the messages with judging-related reactions are.
-    * Run `~auto_make_queues` to generate judging queues.
+    * Run `make_template_queues` to generate judging queues.
 * Modify the generated json file as you like.
 * Run `~start_judging` with the json file to start the judging process.
 

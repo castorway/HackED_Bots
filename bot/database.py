@@ -3,7 +3,7 @@ import utils
 import logging
 import discord
 from discord.utils import get as dget
-from declare_cog import challenge_order
+from declare_cog import challenge_order, challenge_data
 
 args, config = utils.general_setup()
 
@@ -255,7 +255,10 @@ def make_team_info(guild: discord.Guild, team: tuple):
         "team_text": dget(guild.channels, id=int(team[1])),
         "team_vc": dget(guild.channels, id=int(team[2])),
         "team_cat": dget(guild.categories, id=int(team[3])),
-        "team_role": dget(guild.roles, id=int(team[4]))
+        "team_role": dget(guild.roles, id=int(team[4])),
+        # team[5] was medium_pref, got rid of it
+        "github_link": team[6],
+        "devpost_link": team[7],
     }
 
     # get all members
@@ -274,6 +277,10 @@ def make_team_info(guild: discord.Guild, team: tuple):
         })
 
     team_info["team_members"] = members_info
+
+    # get challenges
+    team_info["challenges"] = get_teams_challenges(team[0])
+
     return team_info
 
 
@@ -292,14 +299,15 @@ def get_teams_info(guild: discord.Guild):
 
 
 def get_team_info(guild: discord.Guild, team_name: str):
-    logging.info(f"get_team_info: called")
-    info = {}
+    '''
+    this functionality isn't split up very well, plan to fix later
+    '''
 
+    logging.info(f"get_team_info: called for team {team_name}")
     cur.execute("SELECT * FROM Teams WHERE team_name = ?;", (team_name,))
-    matches = cur.fetchone()
-    info[match[0]] = make_team_info(guild, match)
+    match = cur.fetchone()
 
-    return info
+    return make_team_info(guild, match)
 
 
 def team_from_text_channel(channel_id):
@@ -380,10 +388,12 @@ def get_all_challenge_info():
     info = []
 
     # get all the teams
-    cur.execute("SELECT team_name, medium_pref FROM Teams;")
+    cur.execute("SELECT team_name FROM Teams;")
     matches_team = cur.fetchall()
     
-    for team_name, medium_pref in matches_team:
+    for match in matches_team:
+        team_name = match[0]
+        
         # get the challenges this team signed up for
         cur.execute("SELECT challenge_name FROM Challenges WHERE team_name = ?;", (team_name,))
         matches_chal = cur.fetchall()
@@ -391,7 +401,7 @@ def get_all_challenge_info():
         # construct info
         info.append({
             'team_name': team_name,
-            'medium_pref': medium_pref,
+            # 'medium_pref': medium_pref,
             'challenges': challenge_order([m[0] for m in matches_chal])
         })
 
@@ -418,3 +428,30 @@ def change_team_name(old_name, new_name):
         return True, f"Team `{old_name}` renamed to `{new_name}`."
     except Exception as e:
         logging.error("something went wrong changing team name", exc_info=e)
+
+
+
+def get_team_display(ctx, team_name):
+    '''
+    Format necessary info about a team nicely.
+    '''
+    
+    team_info = get_team_info(ctx.guild, team_name)
+    msg = f"### `{team_name}`\n"
+
+    members_strs = [f'{member["member_object"].mention}' for member in team_info['team_members'] if member["member_object"] != None]
+    msg += f"**Members:** {', '.join(members_strs)}\n"
+
+    chals_strs = '\n'.join(f"- {challenge_data['challenges'][chal]['formatted_name']}" for chal in team_info['challenges'])
+    msg += f"**Challenges:**\n{chals_strs}\n"
+
+    msg += f"**GitHub:** {team_info['github_link']}\n"
+    msg += f"**DevPost:** {team_info['devpost_link']}"
+
+    return msg
+
+
+def get_all_team_role_ids():
+    cur.execute("SELECT role_id FROM Teams;")
+    matches = cur.fetchall()
+    return [x[0] for x in matches]

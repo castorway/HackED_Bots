@@ -86,16 +86,12 @@ Ensure you have checked all of these conditions, or else **your submission will 
 "description": "### `The /judging_signup Command`
 To sign up for judging, run the </judging_signup:1193296708122185862> command in **your team text channel**. This command must be run **before the Hacking End Time**. If your team does not run this command, you *will not* be signed up for judging and will not be eligible for *any* prizes.
 
-**First**, you must declare a medium preference using the `medium_pref` argument.
-- This may be either `online` or `in-person`. We will *try* to put you in a judging room with judges who are also online/in-person for the best experience (but there is no guarantee).
-- Regardless of which judges you are put with, *both online and in-person teams will be able to present*. The medium preference is only a preference; both online and in-person judges are able to judge online and in-person teams.
-
-**Second**, you must submit links to your Github repository and DevPost project using the `github_link` and `devpost_link` arguments.
+**First**, you must submit links to your Github repository and DevPost project using the `github_link` and `devpost_link` arguments.
 - You may at first submit an empty/template Github and DevPost.
 - However, the links you submit **must be updated with your actual project code and information before the Hacking End Time**. We will use these links as our official record of your project.
 - See the [Project Submission Details](https://discord.com/channels/1179492116334919710/1179497189765038191/1190362760920449095) for more information on requirements for the Github and DevPost.
 
-**Third**, you may select your challenge/s using the `challenge1` and `challenge2` arguments.
+**Second**, you may select your challenge/s using the `challenge1` and `challenge2` arguments.
 - You will implicitly be signed up for the main HackED competition, regardless of whether you specify any challenges.
 - **In general, teams may select only 1 challenge**.
 - A special case is when you are signing up for both one of the MecSimCalc challenges and one of the Engineering Department challenges, in which case you may select 2 challenges.

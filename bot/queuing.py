@@ -15,10 +15,67 @@ with open(config['challenge_data_path'], 'r') as f:
     challenge_data = json.loads(f.read())
 
 
-def first_room_match():
+def first_chal_match():
+    '''
+    Puts teams in the first room that matches their challenge. Disregards medium.
+    Returns a dictionary mapping room_id to teams, and a dictionary of unassigned teams.
+    '''
+    info = database.get_all_challenge_info()
+    print(info)
+
+    rooms = {room_id: [] for room_id in config['judging_rooms'].keys()} # available rooms
+    unchosen = [] # teams that seemingly did not choose any challenges (including main hacked), i.e. did not sign up for judging
+    unassigned = [] # teams that picked challenges but don't get assigned a room
+
+    # for each team, get their challenge combo
+    for team_data in info:
+        
+        team_name = team_data['team_name']
+        challenge_choices = team_data['challenges']
+        room_found = False
+        logging.info(f"{team_name}: {challenge_choices}")
+
+        if challenge_choices == []:
+            # team did not sign up for judging
+            logging.info("> team has no recorded challenge choices, skipping")
+            unchosen.append(team_name)
+
+        # if a challenge and medium matches, put in that room
+        for chal in challenge_choices:
+            if chal == challenge_data['main_challenge']: continue
+
+            for room_id, room_info in config['judging_rooms'].items():
+                if chal in room_info['challenges']:
+                    rooms[room_id].append(team_name)
+                    room_found = room_id
+                    break
+
+            if room_found: break
+
+        # if it doesn't match any rooms for optional challenge, put in a default room matching medium
+        if not room_found:
+            for room_id, room_info in config['judging_rooms'].items():
+                if room_info['challenges'] == []:
+                    rooms[room_id].append(team_name)
+                    room_found = room_id
+                    break
+        
+        # if this hasn't worked, error
+        if not room_found:
+            logging.error(f"> Was unable to find a room for {team_name} with medium_pref={medium_pref} and challenges={team_data['challenges']}")
+            unassigned.append(team_name)
+        else:
+            logging.info(f"> Assigned {team_name} to room {room_id}.")
+    
+    return rooms, unchosen, unassigned
+
+
+def first_chal_med_match():
     '''
     Puts teams in the first room that matches their challenge/medium.
     Returns a dictionary mapping room_id to teams, and a dictionary of unassigned teams.
+
+    DEPRECATED
     '''
     info = database.get_all_challenge_info()
     print(info)
@@ -40,6 +97,7 @@ def first_room_match():
             # team did not sign up for judging
             logging.info("> team has no recorded challenge choices, skipping")
             unchosen.append(team_data)
+            continue
 
         # if a challenge and medium matches, put in that room
         for chal in challenge_choices:

@@ -41,16 +41,18 @@
     "judging_rooms": {
         "r1": {
             "display_name": "Judging Room 1", 
-            "mediums": ["in-person"],
+            "mediums": ["in-person", "online"],
             "location": "DICE-??",
+            "pretty": 1192935309692907551,
             "text": 1192935288230658088,
             "judging_vc": 1192935338591662091,
             "challenges": []
         },
         "r2": {
             "display_name": "Judging Room 2", 
-            "mediums": ["online"],
+            "mediums": ["in-person", "online"],
             "location": "DICE-??",
+            "pretty": 1192935403691462666,
             "text": 1192935423916396615,
             "judging_vc": 1192935492690378832,
             "challenges": []
@@ -60,6 +62,7 @@
             "mediums": ["in-person", "online"],
             "location": "DICE-??",
             "text": 1192935547304419398,
+            "pretty": 1192935528778186782,
             "judging_vc": 1192935581194407936,
             "challenges": ["DivE"]
         },
@@ -68,6 +71,7 @@
             "mediums": ["in-person", "online"],
             "location": "DICE-??",
             "text": 1192935648835928154,
+            "pretty": 1192935667760627866,
             "judging_vc": 1192935698488107008,
             "challenges": ["TELUS"]
         },
@@ -76,6 +80,7 @@
             "mediums": ["in-person", "online"],
             "location": "DICE-??",
             "text": 1192935720558526657,
+            "pretty": 1192935743199400028,
             "judging_vc": 1192935805883261009,
             "challenges": ["MecSimCalc General", "MecSimCalc Maps"]
         }

@@ -92,7 +92,26 @@ class Teams(commands.Cog):
                 char_count = len(msg)
 
         await ctx.send(msg)
+
+
+    @commands.command(help=f'''Sends information about a team currently created on the server. Restricted. Cannot be run in a public channel.
+    Usage: {config['prefix']}team_info''')
+    async def team_info(self, ctx, team_name: str):
+
+        # check permissions
+        if not utils.check_perms(ctx.message.author, config["perms"]["can_teams_info"]):
+            logging.info(f"team_info: ignoring nonpermitted call by {ctx.message.author.name}")
+            return
         
+        # check channel is bot channel
+        if ctx.message.channel.id != config["channels"]["bot"]:
+            logging.info(f"team_info: ignoring call in wrong channel by {ctx.message.author.name}")
+            await ctx.message.reply("This command cannot be run here.")
+            return
+
+        msg = database.get_team_display(ctx, team_name)
+        await ctx.reply(msg)
+
 
     @commands.command(help=f'''Add a participant to a team, modifying its list of members. Restricted.
     Usage: {config['prefix']}add_to_team <team_name> <member>

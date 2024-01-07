@@ -10,6 +10,7 @@ from datetime import datetime
 import argparse
 import sys
 
+
 file_path = Path(os.path.realpath(__file__)).parents[0] # path to this directory
 
 # setup args
@@ -141,3 +142,4 @@ async def send_as_json(ctx, dictionary, save_with_tag, send_with_name):
 
     # send file
     await ctx.send(file=discord.File(save_filename, filename=send_with_name))
+
